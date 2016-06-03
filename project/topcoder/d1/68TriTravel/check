@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+
+# 创建临时目录；将当前目录下所有文件拷贝到临时目录；运行check单元测试
+
+curdir=`pwd`
+
+checkdir=`mktemp -d  --tmpdir checkXXXXXX`
+
+cp -r * "$checkdir"
+
+echo "enter $checkdir"
+
+cd "$checkdir"
+
+autoreconf --install
+
+./configure
+
+make
+
+make check
+
+cd "$curdir"
+

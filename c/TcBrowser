@@ -1,0 +1,85 @@
+gcc安装
+../gcc-5.3.0/configure --enable-checking=release --enable-languages=c,c++ --disable-multilib
+ln -s mpfr-2.4.2 mpfr
+ln -s gmp-4.3.2 gmp
+ln -s mpc-0.8.1 mpc
+ln -s isl-0.14 isl
+装完需要修改动态库链接，或者设置LD_LIBRARY
+
+
+
+结果集 list<string> result 是一个有序列表，顺序由insert维护
+map<string, set<string, cmpclass>> input
+
+将输入string[]解析为 input
+	检测输入错误
+	对于没有任何依赖项的class，直接放入result
+
+若parseInput返回false、或者result为空，说明输入有错误，直接返回。
+	parseInput返回false说明string格式有问题
+	result为空说明一定存在一个class，它所依赖的class在输入中不存在
+
+若input不空，重复循环
+	找到一个input中的class A，A依赖的所有class都在result中
+	若A不存在（尾后迭代器），返回错误
+	将A插入result，位置至少在最大依赖class的后面
+	从input中删除A
+
+将result转换为string[]并返回
+
+
+几点注意：
+	可能存在若干分离的子图
+	不能完全靠依赖关系排序，也要看class名字的排序规则。比如class ZZZ999与任何class都没有彼此依赖关系，但也可能排在最后
+
+
+
+
+bool parseInput(string[], map<string, set<string, cmpclass>> &input, list<string> &result)
+
+bool insert(list<string> &result, string)
+
+
+40.html	stringdup.c
+41.html	syntaxmatch.c
+42.html	football.c
+46.html	weekday.c weekday.h weekdaymain.c
+47.html	wordfilter.c
+64.html	increasinglength.c
+65.html	splitint.c
+67.html	vigenere.c
+
+
+
+
+Gi GPRS ggsn sgsn
+
+手机上网拿的IP地址跟基站位置没多大关系。主要是跟ggsn以及Gi口防火墙上的nat地址有关系。
+一般地级市只有sgsn，深圳有ggsn。
+
+pdn 公用数据网，Public Data Network。
+一种由电信运营商组建的广域网，提供接入广域网的服务与技术，为用户提供高质量数据传输服务。
+http://baike.baidu.com/view/950136.htm
+
+Gi口主要针对GRPS？3G、4G网络中类似的概念也叫Gi口？
+
+
+GTD思维。get things done。百度百科。工具软件。omniFocus
+
+
+
+将google test编译为库。
+An assertion's result can be success, nonfatal failure, or fatal failure. 
+Tests use assertions to verify the tested code's behavior.
+A test case contains one or many tests. You should group your tests into test cases that reflect the structure of the tested code. When multiple tests in a test case need to share common objects and subroutines, you can put them into a test fixture class.
+A test program can contain multiple test cases.
+Usually EXPECT_* are preferred, as they allow more than one failures to be reported in a test. 
+In ASSERT_EQ* and EXPECT_EQ* (and all other equality assertions we'll introduce later), you should put the expression you want to test in the position of actual, and put its expected value in expected, as Google Test's failure messages are optimized for this convention.
+if you want to compare C strings (e.g. const char*) by value, use ASSERT_STREQ()
+继承自testing::Test的一个class，是一个test case。
+
+问题：
+	如果一次对多个.cc文件进行测试？在makefile中指定多个目标，就可以？
+	如何将调试信息输出，通过日志？如何进行？
+
+

@@ -1,0 +1,75 @@
+"Vundle =======================================================================
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+Plugin 'tpope/vim-fugitive'
+" plugin from http://vim-scripts.org/vim/scripts.html
+Plugin 'L9'
+" Git plugin not hosted on GitHub
+Plugin 'git://git.wincent.com/command-t.git'
+" git repos on your local machine (i.e. when working on your own plugin)
+Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
+Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Install L9 and avoid a Naming conflict if you've already installed a
+" different version somewhere else.
+Plugin 'ascenator/L9', {'name': 'newL9'}
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+
+" vim-markdown =======================================================================
+Plugin 'godlygeek/tabular'
+Plugin 'plasticboy/vim-markdown'
+au BufNewFile,BufRead *.md set filetype=markdown
+
+
+" vim-go =======================================================================
+Plugin 'fatih/vim-go'
+au BufNewFile,BufRead *.go set filetype=go
+
+
+"自己定义 =======================================================================
+syntax on		"打开语法高亮
+set nu		"显示行号
+set nocompatible	"不要vim模仿vi模式，建议设置，否则会有很多不兼容的问题
+set autoindent	"自动缩进
+set tabstop=4	"让一个tab等于4个空格
+set nowrap		"不自动换行
+set hlsearch	"高亮显示搜索结果
+set incsearch	"在你输入字符串的过程中就实时显示匹配点
+set mouse=a		"不能使光标焦点移动到点击位置；但是可以选择文本区域、复制。
+set backspace=indent,eol,start whichwrap+=<,>,[,] "允许退格键的使用
+set laststatus=2	"一直显示状态栏，如文件名。ctrl+G 显示当前文件
+
+"C语言
+set ci shiftwidth=4 "设置C语言风格的缩进，cindent。索引宽度为4个字符。
+
+filetype plugin indent on
+filetype plugin on

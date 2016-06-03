@@ -1,0 +1,21 @@
+https://book.douban.com/subject/25869486/
+
+vimtutor  /usr/share/vim/vim74/tutor/tutor.zh_cn.utf-8
+help user-manual
+
+
+源代码下载
+https://pragprog.com/titles/dnvim/source_code%202
+
+
+勘误表
+http://easwy.com/blog/practical-vim-errata/
+https://book.douban.com/review/6725047/
+
+
+
+
+http://www.vimer.cn/2009/10/在vimgvim中使用cscope.html
+http://coolshell.cn/articles/11312.html
+https://zh.wikipedia.org/wiki/Vim
+
