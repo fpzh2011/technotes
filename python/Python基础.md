@@ -114,7 +114,19 @@ http://bbs.chinaunix.net/thread-580685-1-1.html
 http://code.activestate.com/recipes/414140/
 http://www.malike.net.cn/blog/2013/11/03/python-constants/
 
-## 中文注释
+## 注释
+
+`#`后面的字符被认为是注释。`#`可以在一行的任何位置。
+
+放在模块、函数、类顶端的字符串，会被Python自动封装，成为对象的`__doc__`属性（学习手册，P385，P97）。这些文档字符串可以用3个引号包起来多行文本，如：
+```python
+"""
+This is mutiple 
+line document.
+"""
+```
+
+### 中文注释
 
 在第一行添加`# -*- coding:utf-8 -*-`，必须是第一行。
 如果要在第一行使用`#!/usr/bin/python`，可以在其它代码文件中使用中文注释，再import。或者用 python my.py。
@@ -125,11 +137,12 @@ https://www.python.org/dev/peps/pep-0263/
 
 ## 显示一个对象的帮助信息
 
-`dir`命令可以显示一个对象支持的属性、操作函数等信息。
+`dir`命令可以显示一个对象支持的属性、操作函数等信息。`help`可以显示一个对象或对象方法的详细帮助信息。
 
 ```python
->>> s = "abc"
->>> dir(s)
+s = "abc"
+dir(s)
+help(s.strip)
 ```
 
 ## http请求
@@ -139,7 +152,7 @@ http://www.oschina.net/code/snippet_54100_7485
 
 ## 变量
 
-Python中没有变量声明、初始化的概念。
+Python中没有变量声明、初始化的概念。但是，变量在使用之前，至少要赋一次值（学习手册，P126）。
 
 http://stackoverflow.com/questions/11007627/python-variable-declaration
 
@@ -176,7 +189,7 @@ print str(10) + " is ten"
 print int('999') + 1
 ```
 
-## 多维数组初始化
+## 嵌套字典（多维关联数组）初始化
 
 对每一维的每个值，都要显示赋值`{}`。所以，下面第一个for语句必不可少。
 ```python
@@ -193,6 +206,22 @@ for i in idctype:
 ```python
 if not v_idctype in stat_port.keys():
 	stat_port[v_idctype] = {}
+```
+
+因为字典`stat_port['1']`的value可能是任何类型，如果是字典类型，需要通过一个空字典显式告诉编译器。
+
+## 序列
+
+序列包括字符串、列表和元组（学习手册，P92）。
+
+序列内置支持的操作包括索引访问、slice切片、迭代器等。
+```python
+s = 'abcde'
+print s[2]
+print s[1:3]	# 相当于C++的 begin/end迭代器，3不被包含
+print s[:-1]	# -1相当于 len(s)-1
+for c in s:
+	print c
 ```
 
 ## 自增操作
