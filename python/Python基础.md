@@ -68,7 +68,16 @@ https://docs.python.org/2/library/json.html
 http://stackoverflow.com/questions/7771011/parse-json-in-python
 http://stackoverflow.com/questions/2835559/parsing-values-from-a-json-file-in-python
 
-## 获取对象类型
+## 动态类型
+
+### 判断类型
+
+```python
+b = True
+print type(b) == bool
+```
+
+### 获取对象类型名称
 
 ```python
 if j[scan_type].__class__.__name__ != 'dict' :
@@ -223,6 +232,8 @@ print s[:-1]	# -1相当于 len(s)-1
 for c in s:
 	print c
 ```
+
+Python貌似没有数组类型。list就是可以动态扩展的数组。
 
 ## 自增操作
 
