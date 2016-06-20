@@ -63,6 +63,13 @@ http://stackoverflow.com/questions/17113619/whats-the-best-way-to-lock-multiple-
 
 http://stackoverflow.com/questions/19463602/compiling-multithread-code-with-g
 
+### 参数传递
+
+C++的thread实现，即使参数声明为引用，也会进行拷贝。所以，对于不能、或不适合拷贝的对象，尽量通过智能指针传递，尽量避免通过普通指针传递。
+
+对于可能进行多线程处理的数据，尽量通过智能指针管理。
+
+
 ## 线程参数拷贝
 
 by default the thread constructor will copy all arguments passed to it

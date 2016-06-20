@@ -1,5 +1,8 @@
 
 
+阮一峰：DNS原理入门
+http://www.ruanyifeng.com/blog/2016/06/dns.html
+
 
 http://wangye.org/blog/archives/158/
 http://wangye.org/blog/archives/196/

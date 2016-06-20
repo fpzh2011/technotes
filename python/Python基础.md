@@ -119,6 +119,7 @@ http://stackoverflow.com/questions/3217673/why-use-argparse-rather-than-optparse
 
 Python中貌似在语法上不能直接定义一个符号为常量（类似C++的const），尽管PEP 8定义了常量的命名规范为大写字母和下划线组成。
 
+学习手册，P308。
 http://bbs.chinaunix.net/thread-580685-1-1.html
 http://code.activestate.com/recipes/414140/
 http://www.malike.net.cn/blog/2013/11/03/python-constants/
@@ -164,6 +165,14 @@ http://www.oschina.net/code/snippet_54100_7485
 Python中没有变量声明、初始化的概念。但是，变量在使用之前，至少要赋一次值（学习手册，P126）。
 
 http://stackoverflow.com/questions/11007627/python-variable-declaration
+
+### 命名管理、本地变量、私有变量
+
+学习手册，P307。
+* `_x`不会被`from module import *`导入。
+* `__x__`是系统定义的变量名，对解释器有特殊意义。
+* `__x`是类的本地变量。
+* 
 
 ## try catch 与作用域
 
@@ -219,11 +228,24 @@ if not v_idctype in stat_port.keys():
 
 因为字典`stat_port['1']`的value可能是任何类型，如果是字典类型，需要通过一个空字典显式告诉编译器。
 
-## 序列
+## 数据类型分类
+
+有多种方法对Python的类型进行分类。
+
+按对象是否可变，可以分为：
+* 不可变类型，如数字、字符串、元组、不可变集合。
+* 可变类型，如列表、字典、可变集合。
+
+按类型操作等特征，可分为：
+* 数字，包括整数、浮点数、二进制、分数等。
+* 序列，包括字符串、列表、元组等。
+* 映射，如字典。
+
+### 序列
 
 序列包括字符串、列表和元组（学习手册，P92）。
 
-序列内置支持的操作包括索引访问、slice切片、迭代器等。
+序列内置支持的操作包括索引访问、slice切片、迭代器、合并、重复等。
 ```python
 s = 'abcde'
 print s[2]
@@ -231,6 +253,10 @@ print s[1:3]	# 相当于C++的 begin/end迭代器，3不被包含
 print s[:-1]	# -1相当于 len(s)-1
 for c in s:
 	print c
+# 合并与重复
+a = [1,2,3]
+b = a * 2		# 重复
+c = a + b		# 合并
 ```
 
 Python貌似没有数组类型。list就是可以动态扩展的数组。
@@ -302,6 +328,51 @@ print "in main"
 import module as mo
 print mo.foo
 ```
+
+## 日志
+
+如果程序将结果输出到标准输出，而又想将错误信息与结果分开，可以用这种方式（学习手册，P317）：
+```python
+import sys
+print >> sys.stderr, "error info"
+print "normal output" 
+```
+
+如果需要详细的日志输出，可以用logging组件。参考：
+http://blog.csdn.net/fxjtoday/article/details/6307285
+http://crazier9527.iteye.com/blog/290018
+https://docs.python.org/2/library/logging.html
+
+## 循环
+
+Python中的for只能处理序列（学习手册，P343）。当Python运行for循环时，会逐个将序列中的元素赋值给目标。注意，是赋值，不是引用（学习手册，P344，P353）。
+Python中没有类似C/C++中的for循环，如：
+```c
+for(int i = 0; i < N; ++i) {
+	//do something ...
+}
+```
+Python实现类似功能，可以用range函数。
+
+## 作用域
+
+### LEGB原则
+
+学习手册，P418
+
+### global
+
+学习手册，P422，423，425
+
+首先，global不是指应用全局，而是指模块作用域，或文件作用域，即在一个模块内的“全局”。
+
+其次，在函数内，只有对全局变量 X 赋值时，才必须用global进行声明，否则 X 就是函数内的局部变量了。
+
+全局变量 X 在函数运行前可能不存在。如果这样的话，函数内的赋值语句将自动在模块中创建全局变量 X。
+
+在模块B中修改模块A的全局变量，尽量通过模块A的函数接口进行修改。
+
+
 
 ### 参考资料
 

@@ -25,8 +25,126 @@ cat <<< $a
 cat <<< 12345678
 ```
 
+## 内置命令帮助信息
+
+`help`命令显示`bash`内置命令的帮助信息。比如：`help cd; help exec`
+
+`man bash`之 SHELL BUILTIN COMMANDS 。
+
+## 变量
+
+默认情况下，在脚本中定义的任何变量都是全局变量，在函数中定义的也是。用`local`修饰变量可以限制变量的作用域（[1], P344,345）。
+注意：`local`只能在函数中用，在全局区域用local修饰变量，会报错。
+```shell
+#!/bin/bash
+function func1 {
+	echo "in func1"
+	echo $a
+	b="this is var b"
+}
+a="test a var"
+echo $a
+func1
+echo $b
+```
+
+## 函数与调试
+
+如果一个脚本比较多的使用函数，可以单独将环境变量、函数定义放到 lib.sh 中，在 main.sh 中通过 `source lib.sh` 加载环境变量和函数等定义。
+
+这样做的好处是，可以在shell中通过 `source lib.sh` 对单个函数进行调试，而不需要调用整个脚本逻辑。
+
+参考`man bash`的`source filename`一节。
+
+## printf 优于 echo
+
+`printf "%s\n" "$a"`
+如果变量a中包含空格、tab等空白字符，必须加引号。
+
+man 1 printf
+http://c.biancheng.net/cpp/view/1499.html
+http://unix.stackexchange.com/questions/65803/why-is-printf-better-than-echo
+
+如果变量a中包含tab字符，echo输出需要增加引号才能打印tab，如`echo "$a"`。
+http://stackoverflow.com/questions/26379243/how-to-split-string-by-tab-in-bash
+
+## read 命令
+
+bash内置的read命令，会对`\`进行转义，并且将tab转换为空格。如果不需要转义，可以用`-r`选项（但是，仍然会舍弃每行首位的tab等空白字符）。
+
+参考：
+`man bash`的`read`一节
+http://wiki.bash-hackers.org/commands/builtin/read
+http://stackoverflow.com/questions/11564778/bash-special-characters-lost-when-reading-file
+
+## 日期运算
+
+### 字符串转换为日期
+
+```shell
+date_fmt="+%Y-%m-%d %H:%M:%S"
+date -d "20160612 08:10:20"
+date -d "20160612 08:10:20 3 days" "$date_fmt"
+```
+
+### 时间戳转换为日期
+
+```shell
+date -d @1465815203
+date -d @1465815203 +%Y-%m-%d
+```
+
+可以使用date命令进行日期运算：
+
+### 加减一定天数
+
+```shell
+date --date="yesterday"
+date --date="tomorrow"
+date --date="today"
+date --date="now"
+date  --date="2 days ago"
+date --date="1 day"
+date --date="-1 day"
+date --date='5 hour'
+date --date='5 minute'
+date --date='60 second'
+date --date='10 week'
+date --date='10 month'
+date --date='10 year'
+date --date="tomorrow 6 hour"
+# 周运算
+date  --date="next Friday"
+# 获取UTC时间戳
+date +%s
+# 获取年月日时分秒
+date_fmt="+%Y-%m-%d %H:%M:%S"
+date "$date_fmt"
+```
+
+参考：
+http://www.cyberciti.biz/tips/linux-unix-get-yesterdays-tomorrows-date.html
+http://stackoverflow.com/questions/11144408/convert-string-to-date-in-bash
+http://www.tutorialarena.com/blog/get-unix-timestamp-in-bash.php
+
+## 集合运算
+
+以下命令的输入都需要排序。
+
+uniq
+comm
+
 
 ## 参考资料
 
 [1] Linux命令行与shell脚本编程大全（第2版）
+
+
+
+
+## 问题
+
+bash中，如果一个变量有tab或换行符，无论是echo，还是cat或者 <<< ，都会被转换为空格。有没有其它方法保留tab？
+
+
 

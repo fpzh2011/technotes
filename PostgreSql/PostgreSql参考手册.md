@@ -156,6 +156,7 @@ mysql一行（row）的最大长度是65535字节，不论是什么存储引擎�
 <=> 安全的null比较操作符，如 `select 1 <=> 1, NULL <=> NULL, 1 <=> NULL;`（P1460）
 
 case when then end 操作符。（P1468）
+PostGreSql中没有decode函数，可以用case-when替代。
 
 IN操作符，如 `SELECT 2 IN (0,3,5,7);`
 
@@ -177,3 +178,7 @@ GROUP_CONCAT可以连接字符串。（P1672）
 
 不支持 full outer join ； 不支持 row_number/rank_number 等分析窗口函数；貌似不支持 with as 语句。
 
+
+## 数据类型转换
+
+`select 1/2 c1, 1::numeric/2::numeric`
