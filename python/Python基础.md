@@ -261,6 +261,10 @@ c = a + b		# 合并
 
 Python貌似没有数组类型。list就是可以动态扩展的数组。
 
+### 列表解析
+
+学习手册，P367-370，P495-500，
+
 ## 自增操作
 
 Python不支持`++`操作符，但支持`a += 1`操作符。
@@ -358,7 +362,7 @@ Python实现类似功能，可以用range函数。
 
 ### LEGB原则
 
-学习手册，P418
+学习手册，P418, P427
 
 ### global
 
@@ -372,6 +376,34 @@ Python实现类似功能，可以用range函数。
 
 在模块B中修改模块A的全局变量，尽量通过模块A的函数接口进行修改。
 
+## 生成器函数
+
+运行下面的例子可以看到，在生成器函数中：
+* for之前的语句只执行一次，在第一次迭代时执行，即调用next时执行，而不是在调用gensquares时执行。
+* for内部的语句，在每次迭代时都执行，无论是在yield前面还是后面。
+* for后面的语句，在迭代结束时执行一次。如果迭代不结束，就不执行。
+
+```python
+#!/usr/bin/python
+
+def gensquares(N):
+	print "in gen"
+	for i in range(N):
+		print "before yield, in for"
+		yield i ** 2
+		print "in for, after yield", i, N
+	print "outer for", i, N
+
+for i in gensquares(5):
+	print i
+
+x = gensquares(10)
+print next(x)
+print x.send(77)
+print x.send(88)
+print x.send(99)
+print next(x)
+```
 
 
 ### 参考资料
@@ -379,7 +411,17 @@ Python实现类似功能，可以用range函数。
 http://stackoverflow.com/questions/710551/import-module-or-from-module-import
 http://stackoverflow.com/questions/9439480/from-import-vs-import
 
+## 内置函数
 
+https://docs.python.org/2/library/functions.html
+
+## 函数参数传递
+
+调用函数时，使用`a = f(*tup)`的形式，tup是一个元组，`*tup`将元祖解包，将各个元素作为参数传递给函数f（学习手册，P456）。
+`a = f(**d)`这种形式，d是一个字典，`**`将字典d解包，以关键字方式传递参数给函数f。（学习手册，P456）
+
+定义函数时，使用`def f(*args): print(args)`的形式，在函数 f 中，args是一个元组，元组的每个元素，对应调用方传递的一个参数。（学习手册，P455）
+`def f(**args): print(args)`这种形式，args是一个字典，`**`和`*`类似，但是`**`只对以关键字方式传递的参数有效。（学习手册，P455）
 
 
 ## 问题

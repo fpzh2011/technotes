@@ -60,6 +60,15 @@ gcc不像MSVC那样有"release mode" 和 "debug mode"。可以开启 `-g` 模式
 http://stackoverflow.com/questions/1534912/how-to-build-in-release-mode-with-optimizations-in-gcc
 http://stackoverflow.com/questions/1079832/how-can-i-configure-my-makefile-for-debug-and-release-builds
 
+### 编译优化选项
+
+貌似默认是 `-O2`
+
+http://stackoverflow.com/questions/11546075/is-optimisation-level-o3-dangerous-in-g?rq=1
+https://gcc.gnu.org/onlinedocs/gcc-3.3.5/gcc/Optimize-Options.html
+http://www.network-theory.co.uk/docs/gccintro/gccintro_49.html
+https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+http://stackoverflow.com/questions/796162/g-compiler-flags-optimization-and-flags-for-making-a-static-library-c
 
 ##参考资料
 

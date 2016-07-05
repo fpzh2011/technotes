@@ -1,0 +1,56 @@
+# rocksdb
+
+https://github.com/facebook/rocksdb/releases/
+
+## 安装
+
+如果需要部署到生产环境，运行`make static_lib`，生成的 librocksdb.a 有225M。程序仅有put代码，静态链接后50M。
+
+https://github.com/facebook/rocksdb/blob/master/INSTALL.md
+
+### RocksDBLite
+
+如果要编译为精简的 RocksDBLite ，需要在Makefile开头增加`OPT=-DROCKSDB_LITE`，生成的 librocksdb.a 有85M。但是静态链接后的程序也有33M。
+
+https://github.com/facebook/rocksdb/blob/master/ROCKSDB_LITE.md
+
+### rocksdbjava
+
+如果编译RocksDB自带的java包，运行`export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 & make rocksdbjava`。生成的jar包和so共享库在目录`java/target/`下。
+如果不设置JAVA_HOME，会报错找不到jni.h。
+
+编译前，将Makefile的DEBUG_LEVEL改为0。否则，`db.close();`会报错，对应如下代码（或者将这行代码注释掉）：
+```cpp
+//db/column_family.cc
+//ColumnFamilyData::~ColumnFamilyData()
+assert(dummy_versions_->TEST_Next() == dummy_versions_);
+```
+
+https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+
+## 操作参考资料
+
+doc/index.html
+https://github.com/facebook/rocksdb/wiki
+https://github.com/facebook/rocksdb/tree/master/examples
+
+
+## Java接口参考资料
+
+https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+java/src/test
+java/samples
+java/target/apidocs/ （编译之后）
+
+
+
+uodown调整monitor2obj的导出逻辑后：
+不限制IP个数（整数），约90分钟。LevelDB 10.7G。
+限制单个trace文件、单个路由器8个目标IP（整数），约40分钟。LevelDB 836M。
+限制单个trace文件、单个路由器8个目标IP（字符串），parse/merge/m2obj线程配置为12/8/20，约44分钟。LevelDB 1.2G。
+
+
+加速：
+	BatchWrite
+
+
