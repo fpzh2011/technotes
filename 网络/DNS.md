@@ -20,3 +20,6 @@ dig @8.8.8.8 _cloud-netblocks4.googleusercontent.com txt
 一个ip可能对应多个ptr记录，比如：
 dig -x 71.118.12.1
 
+DNS地理信息：https://en.wikipedia.org/wiki/LOC_record
+dig loc SW1A2AA.find.me.uk
+

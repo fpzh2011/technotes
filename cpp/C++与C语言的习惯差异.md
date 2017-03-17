@@ -14,6 +14,11 @@ C++中，字面值 'a' 默认是char类型，占一个字节；C语言中，'a' 
 
 应该使用 string.h 中定义的系列函数。参考 http://stackoverflow.com/questions/5290089/how-to-convert-a-number-to-string-and-vice-versa-in-c
 
+## 字符串比较
+
+string的c_str()函数可以得到一个字符指针，指向一个C类型的字符数组，可用于strcmp等字符串比较。
+但是，如果string本身的数据就包含`'\0'`字符，比如二进制数据，就不能用c_str()转换。
+
 ## 数组遍历
 
 对于数组，标准库定义了两个函数：begin()返回第一个元素的指针，end()返回尾后指针。

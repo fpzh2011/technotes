@@ -2,26 +2,10 @@
 
 https://github.com/facebook/rocksdb/releases/
 
-## 依赖组建
-
-### snappy
-
-使用yum安装的snappy库进行读取时，读数据库时可能会报错：“Corruption: Snappy not supported or corrupted Snappy compressed block contents”。
-编译构建snappy的过程（库文件安装到 /usr/local/lib/）：
-```shell
-sudo yum remove snappy snappy-devel
-git clone git://github.com/google/snappy
-cd snappy
-./autogen.sh
-./configure
-make
-sudo make install
-```
-
 ## 安装
 
 如果需要部署到生产环境，运行`make static_lib`，生成的 librocksdb.a 有225M。程序仅有put代码，静态链接后50M。
-运行`make shared_lib`生成共享库，完成后运行`ldd librocksdb.so`检查动态链接库是否正常。必要时设置`export LD_LIBRARY_PATH=/usr/local/lib`。
+运行``生成共享库。
 
 https://github.com/facebook/rocksdb/blob/master/INSTALL.md
 
@@ -44,35 +28,6 @@ assert(dummy_versions_->TEST_Next() == dummy_versions_);
 ```
 
 https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
-
-## 写优化
-
-https://github.com/facebook/rocksdb/wiki/RocksDB-FAQ  What's the fastest way to load data into RocksDB?
-https://github.com/facebook/rocksdb/wiki/Creating-and-Ingesting-SST-files
-https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide
-https://github.com/facebook/rocksdb/wiki/Basic-Operations
-https://github.com/facebook/rocksdb/wiki/RocksDB-Basics
-
-最快的方式是`PrepareForBulkLoad()`，可以参照这个函数中的选项设置，在调用该函数后，加大个别选项的值。
-更快的方式是直接写SST文件再添加到DB。
-
-环境：rhel6.8，磁盘，384G内存，40核
-
-禁止WAL
-disableDataSync
-WriteBatch
-
-Parallelism options
-options.env->SetBackgroundThreads(num_threads, Env::Priority::HIGH);
-options.env->SetBackgroundThreads(num_threads, Env::Priority::LOW);
-max_background_compactions
-max_background_flushes
-
-其它可以考虑的：
-Options::write_buffer_size 这2个参数似乎还变慢了
-max_write_buffer_number
-Universal Compaction
-num_levels
 
 ## 操作参考资料
 
@@ -98,11 +53,5 @@ uodown调整monitor2obj的导出逻辑后：
 
 加速：
 	BatchWrite
-
-## 常用工具
-
-查询管理工具：ldb
-https://github.com/facebook/rocksdb/wiki/Administration-and-Data-Access-Tool
-`make ldb`
 
 

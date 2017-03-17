@@ -40,8 +40,20 @@ sudo mv /usr/bin/cpp /usr/bin/cpp-4.4.7
 sudo ln -s /opt/gcc_4_9/bin/gcc-4.9 /usr/bin/gcc
 sudo ln -s /opt/gcc_4_9/bin/g++-4.9 /usr/bin/g++
 sudo ln -s /opt/gcc_4_9/bin/cpp-4.9 /usr/bin/cpp
-
+# 解决g3log构建问题
+sudo mv /usr/bin/c++ /usr/bin/c++-4.4.7
+sudo ln -s /opt/gcc_4_9/bin/c++-4.9 /usr/bin/c++
+sudo mv /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1plus /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1plus-4.4.4
+sudo ln -s /opt/gcc_4_9/libexec/gcc/x86_64-linux-gnu/4.9.3/cc1plus /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1plus
+sudo mv /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1 /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1-4.4.7
+sudo ln -s /opt/gcc_4_9/libexec/gcc/x86_64-linux-gnu/4.9.3/cc1 /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/cc1
+sudo mv /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/collect2 /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/collect2-4.4.7
+sudo ln -s /opt/gcc_4_9/libexec/gcc/x86_64-linux-gnu/4.9.3/collect2 /usr/libexec/gcc/x86_64-redhat-linux/4.4.4/collect2
 ```
+
+## 编译、连接与运行
+
+连接时可以设置`export LD_RUN_PATH=/opt/gcc_4_9/lib64`。运行时可以设置`export LD_LIBRARY_PATH=/opt/gcc_4_9/lib64`。
 
 ## 参考资料
 

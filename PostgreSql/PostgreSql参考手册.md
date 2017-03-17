@@ -143,6 +143,8 @@ blob是二进制字符串，没有字符集；text是字符组成的字符串（
 
 enum在内部表示为整数，但在查询、输出时自动转换为字符串。（P1378，1400）
 
+判断空字符串，应该用`a.name != ''`，而不能用`a.name is not null`。在postGreSql中，空串貌似不是null，只有显式设置null，才是null。
+
 ## 数据类型的存储
 
 CH 11.8 Data Type Storage Requirements

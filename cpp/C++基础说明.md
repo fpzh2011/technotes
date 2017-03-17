@@ -158,6 +158,9 @@ std::cin >> i >> j; 如何判断输入是否成功，比如需要整数，但实
 连续的 >> ，是一次函数调用，还是两次？从汇编代码看，应该是两次函数调用。如果内容不匹配，会退回缓冲区。
 表达式 std::cin >> i 返回值是其左侧运算符，即cin。cout也类似。
 
+make_shared 会返回空指针吗？如果持续创建堆内存知道用尽，程序直接退出“已杀死”，即使尝试捕捉异常，也不会输出任何其它信息。是因为assert退出进程吗？
+用strace跟踪，killed by SIGKILL，有可能是操作系统直接杀死进程。
+http://stackoverflow.com/questions/11922262/what-happens-if-a-shared-ptrs-constructor-fails
 
 
 C不支持泛型，对于栈、队列等常用数据类型，是否每次都需要自己重新写？

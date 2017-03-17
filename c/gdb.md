@@ -1,5 +1,16 @@
 # GDB学习
 
+## 安装
+
+除了安装gdb，还需要安装glib等的debug包。否则，会提示`Missing separate debuginfos, use: debuginfo-install glibc-2.12-1.192.el6.x86_64 zlib-1.2.3-29.el6.x86_64`。
+
+```shell
+sudo yum install yum-utils
+sudo debuginfo-install glibc zlib
+```
+
+http://stackoverflow.com/questions/10389988/missing-separate-debuginfos-use-debuginfo-install-glibc-2-12-1-47-el6-2-9-i686
+
 ## 编译选项
 
 `gcc -g a.c`	# g选项表明增加debug信息

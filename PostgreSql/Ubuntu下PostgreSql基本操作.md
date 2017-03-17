@@ -11,10 +11,14 @@ http://wiki.ubuntu.com.cn/PostgreSQL
 
 安装后会新建用户postgres。`grep postgres /etc/passwd`，home目录是 /var/lib/postgresql 。
 
+centos需要：`sudo service postgresql-9.4 initdb`
+
 ### 启动、关闭数据库
 
 sudo /etc/init.d/postgresql start
 sudo /etc/init.d/postgresql stop
+或者
+sudo service postgresql-9.4 start
 
 ### 设置密码
 

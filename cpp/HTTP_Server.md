@@ -10,8 +10,8 @@ star	URL
 51	https://github.com/azadkuh/qhttp
 
 
-
-
-
-
+/usr/local/share/info/libmicrohttpd.info
+/usr/local/share/info/libmicrohttpd-tutorial.info
+http://www.oschina.net/p/gnu+libmicrohttpd
+Adding headers to a response
 

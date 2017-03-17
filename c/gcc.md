@@ -70,6 +70,10 @@ http://www.network-theory.co.uk/docs/gccintro/gccintro_49.html
 https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
 http://stackoverflow.com/questions/796162/g-compiler-flags-optimization-and-flags-for-making-a-static-library-c
 
+## 反汇编、饭编译
+
+objdump -d 或 objdump -D （反汇编全部内容）
+
 ##参考资料
 
 	[1] C程序设计语言（K&R第二版）,P75， ISNB：978-7-111-12806-9

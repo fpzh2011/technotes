@@ -28,6 +28,8 @@ import sys
 for line in sys.stdin:
 	#print 1, line
 	sys.stdout.write(line)
+	
+#print('....', end='') #Python3
 ```
 
 ## string
@@ -357,6 +359,29 @@ for(int i = 0; i < N; ++i) {
 }
 ```
 Python实现类似功能，可以用range函数。
+
+### for循环
+
+for循环可用于任何可迭代的对象（学习手册P361）。可迭代对象是序列观念的通用化。
+
+## 迭代协议 迭代器
+
+学习手册（P362）
+迭代协议：有`__next__`方法的对象，用于迭代工具时（如for语句），会逐个前进到下一个结果，而在一系列结果的末尾时，会引发StopIteration异常。
+在Python中，所有迭代工具都是在每次迭代中调用`__next__`，并捕捉StopIteration异常来确定何时离开。
+
+### 迭代环境
+
+下列情况会应用迭代协议（学习手册P371）：
+* for语句
+* 列表解析
+* in成员关系测试
+* map、zip、sorted、enumerate、filter、reduce、sum、any、all、max、min等内置函数
+
+## 程序结构
+
+学习手册P280
+if/while等语句，没有括号表示语句块，而是用缩进表示语句块，缩进的结束就是代码块的结束。
 
 ## 作用域
 

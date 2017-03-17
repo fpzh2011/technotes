@@ -86,6 +86,10 @@ p之后直接回车，以密文传输口令。也可以在p之后空格间隔dbN
 
 	status;
 
+## 从shell发起命令
+
+mysql -h 192.168.0.245 -u ipip -p db_name -e "select ip, name from host limit 10;" | tail -n +2
+
 ## load数据
 
 ```sql
