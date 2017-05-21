@@ -74,6 +74,20 @@ http://stackoverflow.com/questions/796162/g-compiler-flags-optimization-and-flag
 
 objdump -d 或 objdump -D （反汇编全部内容）
 
+## 编译GCC
+
+下载 [GCC](ftp://mirrors.kernel.org/gnu/gcc/gcc-4.9.4/gcc-4.9.4.tar.bz2) 和 [签名文件](ftp://mirrors.kernel.org/gnu/gcc/gcc-4.9.4/gcc-4.9.4.tar.bz2.sig)
+
+下载 [公钥文件](https://ftp.gnu.org/gnu/gnu-keyring.gpg) [参考资料](http://stackoverflow.com/questions/15331015/how-to-verify-downloaded-file-with-sig-file)
+
+验证下载文件：`gpg --verify --keyring ./gnu-keyring.gpg gcc-4.9.4.tar.bz2.sig`
+
+
+
+
+
+
+
 ##参考资料
 
 	[1] C程序设计语言（K&R第二版）,P75， ISNB：978-7-111-12806-9

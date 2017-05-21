@@ -92,6 +92,10 @@ http://www.cnpythoner.com/post/104.html
 https://docs.python.org/2/reference/compound_stmts.html#try
 https://docs.python.org/2/library/exceptions.html
 
+### 环境管理器（context manager），with/as语句
+
+Python学习手册，P851。
+
 ## 命令行参数解析
 
 2.7以前的版本用 optparse ；2.7及以后的版本用 argparse 。
@@ -116,6 +120,8 @@ print options.add
 
 http://stackoverflow.com/questions/20063/whats-the-best-way-to-grab-parse-command-line-arguments-passed-to-a-python-scri
 http://stackoverflow.com/questions/3217673/why-use-argparse-rather-than-optparse
+http://python.usyiyi.cn/python_278/library/argparse.html
+http://blog.xiayf.cn/2013/03/30/argparse/
 
 ## 常量
 
@@ -266,6 +272,9 @@ Python貌似没有数组类型。list就是可以动态扩展的数组。
 ### 列表解析
 
 学习手册，P367-370，P495-500，
+
+在Python3中，map、filter、reduce都是可迭代对象；而在Python2中都不是可迭代对象，map、filter直接返回列表，reduce返回计算结果。（学习手册P489）
+可以用`itertools.imap`和`itertools.ifilter`返回generator object。`reduce`还没有发现可以返回generator object的版本。
 
 ## 自增操作
 
@@ -448,6 +457,59 @@ https://docs.python.org/2/library/functions.html
 定义函数时，使用`def f(*args): print(args)`的形式，在函数 f 中，args是一个元组，元组的每个元素，对应调用方传递的一个参数。（学习手册，P455）
 `def f(**args): print(args)`这种形式，args是一个字典，`**`和`*`类似，但是`**`只对以关键字方式传递的参数有效。（学习手册，P455）
 
+## 多个返回值
+
+```python
+a, b = b, a #swap
+[a, b, c] = (1, 2, 3)
+```
+参考 Python学习手册 P294，序列赋值。
+
+## ipython
+
+安装：`sudo pip install ipython`
+
+运行`ipython`，CentOS7报错：
+```
+Traceback (most recent call last):
+  File "/usr/bin/ipython", line 7, in <module>
+    from IPython import start_ipython
+  File "/usr/lib/python2.7/site-packages/IPython/__init__.py", line 49, in <module>
+    from .terminal.embed import embed
+  File "/usr/lib/python2.7/site-packages/IPython/terminal/embed.py", line 18, in <module>
+    from IPython.terminal.interactiveshell import TerminalInteractiveShell
+  File "/usr/lib/python2.7/site-packages/IPython/terminal/interactiveshell.py", line 94, in <module>
+    class TerminalInteractiveShell(InteractiveShell):
+  File "/usr/lib/python2.7/site-packages/IPython/terminal/interactiveshell.py", line 139, in TerminalInteractiveShell
+    highlighting: \n %s""" % ', '.join(get_all_styles())
+  File "/usr/lib64/python2.7/site-packages/pygments/styles/__init__.py", line 79, in get_all_styles
+    for name, _ in find_plugin_styles():
+  File "/usr/lib64/python2.7/site-packages/pygments/plugin.py", line 62, in find_plugin_styles
+    for entrypoint in iter_entry_points(STYLE_ENTRY_POINT):
+  File "/usr/lib64/python2.7/site-packages/pygments/plugin.py", line 45, in iter_entry_points
+    import pkg_resources
+  File "/usr/lib/python2.7/site-packages/pkg_resources/__init__.py", line 72, in <module>
+    import packaging.requirements
+  File "/usr/lib/python2.7/site-packages/packaging/requirements.py", line 59, in <module>
+    MARKER_EXPR = originalTextFor(MARKER_EXPR())("marker")
+TypeError: __call__() takes exactly 2 arguments (1 given)
+```
+[解决方案](http://stackoverflow.com/questions/42029545/pip-is-error-typeerror-call-takes-exactly-2-arguments-1-given)：
+将`/usr/lib/python2.7/site-packages/packaging/requirements.py`中的`MARKER_EXPR = originalTextFor(MARKER_EXPR())("marker")`改为`MARKER_EXPR = originalTextFor(MARKER_EXPR)("marker")`。
+
+### ipython的优点
+
+[优点](https://itacey.gitbooks.io/learning_ipython/content/%E7%AC%AC%E4%B8%80%E7%AB%A0.html)：
+* 可以运行部分Shell命令，tab补全
+* 语法高亮
+* 自动补全
+
+其它参考资料：
+http://mindonmind.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/
+
+## 第三方包管理
+
+Python中管理第三方包有两种方式，`pip`和`easy_install`。
 
 ## 问题
 

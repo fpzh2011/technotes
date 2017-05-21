@@ -92,6 +92,12 @@ select c1 from t2
 
 http://www.cnblogs.com/sekihin/archive/2009/01/14/1375329.html
 
+## 权限
+
+https://github.com/digoal/blog/blob/master/201605/20160510_01.md
+
+
+
 
 
 
