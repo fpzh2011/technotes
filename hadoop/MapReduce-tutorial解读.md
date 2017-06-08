@@ -81,9 +81,6 @@ public class WordCount {
 MapReduce在结构上是独立于HDFS的。从上面的WordCount的例子可以看到，它与HDFS只通过`addInputPath/setOutputPath`函数调用建立联系。
 MapReduce框架中的Master是ResourceManager，担负调度、监控等管理职责；slave是NodeManager，执行具体的计算任务。通常DataNode和NodeManager是同一个节点。
 
-MRAppMaster？？？？？？？？？？？？？？一个Job对应一个MRAppMaster？
-The MapReduce framework consists of a single master ResourceManager, one slave NodeManager per cluster-node, and MRAppMaster per application (see YARN Architecture Guide).
-
 ### 用Java以外的语言运行MapReduce
 
 虽然Hadoop是用Java编写的，也可以用其它语言实现MapReduce任务，有两种方式：
