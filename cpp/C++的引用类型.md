@@ -29,6 +29,10 @@
 	http://stackoverflow.com/questions/752658/is-the-practice-of-returning-a-c-reference-variable-evil
 	http://stackoverflow.com/questions/114180/pointer-vs-reference
 
+## ref函数
+
+头文件`<functional>`中的函数`std::ref()`可以返回对象的reference_wrapper，可用于线程间传递引用参数。
+
 ## 汇编分析
 
 操作引用对象，与操作被引用对象，生成的指令不同。

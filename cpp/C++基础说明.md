@@ -78,6 +78,35 @@ gcc可以用 `int x = 0b101; ` ，符合C++2014标准，但目前并不是所有
 
 http://stackoverflow.com/questions/2611764/can-i-use-a-binary-literal-in-c-or-c
 
+## 浮点数
+
+`nan, inf`这些值都是[IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point)定义的，和1、2、3一样都是可存储为double的值。
+```cpp
+#include <iostream>
+#include <limits>
+
+int main() {
+	//inf的输出显示
+	std::cout << std::numeric_limits<double>::infinity() << std::endl;
+	std::cout << -std::numeric_limits<double>::infinity() << std::endl;
+	std::cout << (1.0 + std::numeric_limits<double>::infinity()) << std::endl;
+	std::cout << (1.0 - std::numeric_limits<double>::infinity()) << std::endl;
+	//比较大小
+	std::cout << (1.0 > std::numeric_limits<double>::infinity()) << std::endl;
+	std::cout << (1.0 < std::numeric_limits<double>::infinity()) << std::endl;
+	//nan
+	std::cout << std::numeric_limits<double>::quiet_NaN() << std::endl;
+	std::cout << std::numeric_limits<double>::signaling_NaN() << std::endl;
+	std::cout << (1.0 + std::numeric_limits<double>::quiet_NaN()) << std::endl;
+	//float
+	std::cout << std::numeric_limits<float>::infinity() << std::endl;
+	std::cout << std::numeric_limits<float>::quiet_NaN() << std::endl;
+	//int
+	std::cout << std::numeric_limits<int>::signaling_NaN() << std::endl;
+	return 0;
+}
+```
+
 ## 开源项目
 
 leveldb https://github.com/google/leveldb

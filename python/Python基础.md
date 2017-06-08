@@ -1,4 +1,37 @@
+# Python基础
 
+## 关键字
+
+### 打印关键字列表
+
+```python
+import keyword
+print keyword.kwlist
+```
+
+### 关键字is
+
+`is` tests for identity, not equality. That means Python simply compares the memory address a object resides in.
+https://stackoverflow.com/questions/2987958/how-is-the-is-keyword-implemented-in-python
+
+### 关键字del
+
+`del`语句只是删除变量名对对象的引用，并不会立即释放内存或触发gc。
+https://docs.python.org/2.0/ref/del.html
+https://stackoverflow.com/questions/14969739/python-del-statement
+https://stackoverflow.com/questions/1316767/how-can-i-explicitly-free-memory-in-python
+
+### 关键字exec
+
+`exec`语句解析一个字符串、或文件，并执行其中的Python代码。
+https://docs.python.org/2.0/ref/exec.html
+https://stackoverflow.com/questions/2220699/whats-the-difference-between-eval-exec-and-compile-in-python
+
+### 关键字or
+
+`or`可以实现类似`coalesce`的操作：`s = s1 or 'foo'`
+https://docs.python.org/2/reference/expressions.html#boolean-operations
+https://stackoverflow.com/questions/4978738/is-there-a-python-equivalent-of-the-c-sharp-null-coalescing-operator
 
 ## 模块
 
@@ -77,6 +110,10 @@ http://stackoverflow.com/questions/2835559/parsing-values-from-a-json-file-in-py
 ```python
 b = True
 print type(b) == bool
+# 判断对象是否某个类型（如基类object）的实例
+isinstance(b, object)
+# 判断类A是否是object的子类
+issubclass(A, object)
 ```
 
 ### 获取对象类型名称
@@ -84,6 +121,12 @@ print type(b) == bool
 ```python
 if j[scan_type].__class__.__name__ != 'dict' :
 	continue
+# 判断类型
+if not isinstance(j[scan_type], dict):
+	continue
+# 打印完整类型名称
+o = j[scan_type]
+print o.__module__ + "." + o.__class__.__name__
 ```
 
 ## 异常处理
@@ -116,6 +159,15 @@ parser.add_option("-a", "--add",
 options, args = parser.parse_args();
 print "Query string:", options.query
 print options.add
+```
+
+argparse的例子：
+```python
+import argparse
+parser = argparse.ArgumentParser(description='输入IP C段地址，生成trace path graph的dot格式文件')
+parser.add_argument('--ipdb', default='abc', required=True, help='IP库文件')
+args = parser.parse_args()
+print args.ipdb
 ```
 
 http://stackoverflow.com/questions/20063/whats-the-best-way-to-grab-parse-command-line-arguments-passed-to-a-python-scri
@@ -179,8 +231,9 @@ http://stackoverflow.com/questions/11007627/python-variable-declaration
 学习手册，P307。
 * `_x`不会被`from module import *`导入。
 * `__x__`是系统定义的变量名，对解释器有特殊意义。
-* `__x`是类的本地变量。
-* 
+* `__x`是类的本地变量（前面有两个下划线），系统会自动在变量名前添加类名。
+
+http://stackoverflow.com/questions/1301346/what-is-the-meaning-of-a-single-and-a-double-underscore-before-an-object-name
 
 ## try catch 与作用域
 
@@ -208,11 +261,24 @@ sys.stdout.write('Dive in')
 
 http://www.diveintopython.net/scripts_and_streams/stdin_stdout_stderr.html
 
-## 字符串与数值的转换
+## 数据转换
+
+### 字符串与数值的转换
 
 ```python
 print str(10) + " is ten"
 print int('999') + 1
+```
+
+### IP地址转换
+
+以下只支持紧凑格式，不支持`192.168.004.054`这种格式。
+```python
+import netaddr
+print int(netaddr.IPAddress('192.168.4.54'))
+#3232236598
+print str(netaddr.IPAddress(3232236598))
+#192.168.4.54
 ```
 
 ## 嵌套字典（多维关联数组）初始化
@@ -249,6 +315,48 @@ if not v_idctype in stat_port.keys():
 * 序列，包括字符串、列表、元组等。
 * 映射，如字典。
 
+### 字符串
+
+字符串str是字节序列，unicode是字符序列，unicode可以根据编码方式（如utf-8）转为字符串str。
+字符串在Python中具有不可变性。Python学习手册，P94。
+`\0`不表示字符串的结束。Python学习手册，P172。
+```python
+a = r'\t'
+print a, a.__class__.__name__
+a = r'中国'
+print a, a.__class__.__name__
+a = u'中国'
+print a, a.__class__.__name__
+```
+
+### 整数
+
+Python对整数的大小在逻辑上没有限制，只有一些物理限制，如不能超过内存大小。
+较小的整数，Python会处理为[Plain Integer Objects](https://docs.python.org/2/c-api/int.html)，用`i.__class__.__name__`显示为`int`。普通整数的值域与系统平台相关，如CentOS7_64上最大是2的64次方减1。
+如果数字变得更大，Python会自动转换为[Long Integer Objects](https://docs.python.org/2/c-api/long.html)，用`i.__class__.__name__`显示为`long`。
+
+```python
+i = 1 << 62
+print i, i.__class__.__name__
+# 按64位有符号整数，1左移63位变为-1，但是Python自动转为long
+i = 1 << 63
+print i, i.__class__.__name__
+```
+
+但是`float`是有最大值的。如下代码会报错：
+```python
+import sys
+# 显示float最大值
+sys.float_info
+# 超过值域的赋值会报错
+i = pow(10,1000)
+f = i + 0.1
+```
+
+http://stackoverflow.com/questions/9860588/maximum-value-for-long-integer
+http://stackoverflow.com/questions/3477283/what-is-the-maximum-float-in-python
+http://stackoverflow.com/questions/3477283/what-is-the-maximum-float-in-python
+
 ### 序列
 
 序列包括字符串、列表和元组（学习手册，P92）。
@@ -276,9 +384,56 @@ Python貌似没有数组类型。list就是可以动态扩展的数组。
 在Python3中，map、filter、reduce都是可迭代对象；而在Python2中都不是可迭代对象，map、filter直接返回列表，reduce返回计算结果。（学习手册P489）
 可以用`itertools.imap`和`itertools.ifilter`返回generator object。`reduce`还没有发现可以返回generator object的版本。
 
+### None类型
+
+[None](https://docs.python.org/2/library/constants.html#None)是[types.NoneType](https://docs.python.org/2/library/types.html#types.NoneType)类型的singleton对象。任何对`None`的赋值、添加属性等操作都会报错；手动创建`types.NoneType`对象也会报错。
+
+`None`和`__debug__`是真正的常量，都不能进行任何修改。而`True`和`False`是可修改的。
+
+判断一个变量是否是`None`，应该用`is`或`is not`。`==`虽然也可以，但是对singleton对象不推荐使用。
+https://stackoverflow.com/questions/23086383/how-to-test-nonetype-in-python
+https://www.python.org/dev/peps/pep-0008/#programming-recommendations
+
+### float
+
+`nan, inf`这些值都是[IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point)定义的，和1、2、3一样都是可存储为float的值。所以，下面的这些语句都是合理、合法的。
+```pytyhon
+x = float('NaN')
+x = float('inf')
+x = -x
+x = float('-inf')
+float('inf') == float('inf') # Fasle
+float('inf') is float('inf') # Fasle
+import math
+math.isnan(x)
+```
+
 ## 自增操作
 
 Python不支持`++`操作符，但支持`a += 1`操作符。
+
+## 类class
+
+类的静态属性（数据成员）。直接对类的属性进行赋值，就可以创建类的静态属性，如`A.a = 1`，或者在类定义的顶层赋值，如`calss A: x = 1`（P699）。
+类的静态方法，在`def`语句前一行添加`@staticmethod`修饰符（P691,796）。参考：https://docs.python.org/2/library/functions.html#staticmethod
+
+### 抽象超类
+
+P695-697
+Python2中，类如果包含用`@abstractmethod`修饰的成员函数，就是成员类，该成员函数的具体实现由子类提供。
+
+### 新式类
+
+继承自`object`的类是新式类（P779）。
+CentOS7_64, Python2.7.5下，不必显示声明，类自动继承object。
+
+## 装饰器decorator
+
+类似Java的注解。P805, 979。
+
+## 元类
+
+P808，1046
 
 ## import和from
 
@@ -398,6 +553,8 @@ if/while等语句，没有括号表示语句块，而是用缩进表示语句块
 
 学习手册，P418, P427
 
+Python没有语句块作用域。在try、if等语句块中定义的变量，作用域是Local，即所在函数内部。所以，不需要在try之前显示定义变量。
+
 ### global
 
 学习手册，P422，423，425
@@ -507,9 +664,29 @@ TypeError: __call__() takes exactly 2 arguments (1 given)
 其它参考资料：
 http://mindonmind.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/
 
+## mysql
+
+Python中最常用的MySQL库是[MySQL-python](https://pypi.python.org/pypi/MySQL-python/)。CentOS7下的安装命令为`sudo yum install MySQL-python`。
+
+http://mysql-python.sourceforge.net/MySQLdb.html
+http://mysql-python.sourceforge.net/MySQLdb-1.2.2/
+https://stackoverflow.com/questions/372885/how-do-i-connect-to-a-mysql-database-in-python
+https://www.quora.com/Whats-the-best-MySQL-library-for-Python
+
+貌似不支持PreparedStatement: https://stackoverflow.com/questions/1947750/does-python-support-mysql-prepared-statements
+
+查询参数 https://stackoverflow.com/questions/775296/python-mysql-parameterized-queries
+```python
+c.execute("SELECT * FROM foo WHERE bar = %s AND baz = %s", (param1, param2))
+```
+
 ## 第三方包管理
 
 Python中管理第三方包有两种方式，`pip`和`easy_install`。
+
+## ipython
+
+在ipython中运行python脚本文件：`run test.py`
 
 ## 问题
 
