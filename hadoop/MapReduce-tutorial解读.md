@@ -122,6 +122,7 @@ MapReduce是利用多个节点、分布式、并行执行的。MapReduce框架�
 `InputSplit`并没有作为输入直接提供给`Mapper`，因为数据记录可能跨越分割边界，不同的数据也有不同的解析格式。`InputFormat`的另一个方法`createRecordReader`返回一个[RecordReader](http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/RecordReader.html)对象。`RecordReader`负责读取、解析`InputSplit`指定的数据，并处理记录跨越边界的问题。`RecordReader`将`InputSplit`指定的数据分解为key/value pairs，框架将单个key/value pair传递给`Mapper`的`map`方法。因为记录可能跨越边界，即使`Mapper`处理的数据就在本地，也可能会发生远程的读操作。
 
 WordCount的例子中并没有显式指定`InputFormat`，如果通过配置参数、或在代码中显式指定，`Job`的父类`JobContextImpl`的`getInputFormatClass`方法会返回`TextInputFormat`类，这是框架默认的`InputFormat`（[参考](http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html##Job_Input)）。[stackoverflow的这篇文章](https://stackoverflow.com/questions/14291170/how-does-hadoop-process-records-split-across-block-boundaries)剖析了`TextInputFormat`对跨越分割边界的行的处理机制。
+框架默认的`OutputFormat`是`TextOutputFormat`。
 下面的代码示例了默认的`InputFormat`：
 ```java
 /*
@@ -140,6 +141,7 @@ public class Test {
 		Configuration conf = new Configuration();
 		Job job = Job.getInstance(conf, "test");
 		System.out.println(job.getInputFormatClass());
+		System.out.println(job.getOutputFormatClass());
 	}
 }
 ```
@@ -168,9 +170,18 @@ MapReduce框架为每个`InputSplit`生成一个map task。
 如果配置了combiner，`Mapper`的输出结果会在本地进行合并后，再传输给`Reducer`。
 如果`Reducer`的个数为0，`Mapper`的输出结果会不经过排序、直接写到`Job`的输出路径。
 
-`Mapper`的输出会暂存到本地文件系统，不会写到HDFS（[Map_Parameters](http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html#Map_Parameters), [stackoverflow](https://stackoverflow.com/questions/8603435/in-hadoop-where-does-the-framework-save-the-output-of-the-map-task-in-a-normal-m)）。应用在`map`方法中可以用`Counter`报告统计信息。
+`Mapper`的输出会以[SequenceFile](https://wiki.apache.org/hadoop/SequenceFile)格式暂存到本地文件系统，不会写到HDFS（[Map_Parameters](http://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html#Map_Parameters), [stackoverflow](https://stackoverflow.com/questions/8603435/in-hadoop-where-does-the-framework-save-the-output-of-the-map-task-in-a-normal-m)）。应用在`map`方法中可以用`Counter`报告统计信息。
 
 以上可以参考Tutorial和[Mapper](http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/Mapper.html)的文档。
+
+#### Mapper输出数据到多个路径
+
+用`org.apache.hadoop.mapreduce.lib.output.MultipleOutputs`可以将输出写到多个路径。
+比如，同样的原始数据，根据不同的分析主题，用不同的方法进行整合，并输出到不同的文件。
+如果`Reducer`个数设置为0，`Mapper`的输出也可以设置到多个路径。
+参考：
+http://qindongliang.iteye.com/blog/2043190
+http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/output/MultipleOutputs.html
 
 ### Reducer
 
@@ -206,3 +217,25 @@ MapReduce是在独立的JVM进程中执行的。
 2.8.0似乎没有`MRAppMaster`这个类。只是一个组件角色名称？
 http://blog.csdn.net/lipeng_bigdata/article/details/51288673
 
+## SequenceFile
+
+[SequenceFile](https://hadoop.apache.org/docs/stable/api/org/apache/hadoop/io/SequenceFile.html)是Hadoop定义的、存储二进制key-value数据的文件格式。文件头中定义了kye/value的类型信息。
+[stackoverflos](https://stackoverflow.com/questions/34243134/what-is-sequence-file-in-hadoop)上有篇帖子，从小文件的角度介绍`SequenceFile`的作用，可以参考。
+
+`SequenceFile`类更像是一个工具类，其构造函数是私有的，无法创建对象；其`public`方法都是`static`的，主要是`createWriter`方法。
+该类内部定义了多个`public class`，但是没有这些类的文档。
+
+[这篇资料](http://hadooptutorial.info/hadoop-sequence-files-example/)解释了如何读写SequenceFile。
+
+**SequenceFile写入**
+在`WordCount`的例子中，通过`context.write`写入数据，框架会根据Job配置自动决定写入到哪里。
+而如果手动写入SequenceFile，需要调用`SequenceFile.createWriter()`得到writer，用writer写入数据到文件系统。创建writer时会指定key/value的类型，类型信息会保存到SequenceFile的文件头中。
+
+**SequenceFile读取**
+读取SequenceFile需要新建一个`SequenceFile.Reader`。reader会根据SequenceFile文件头中的key/value类型信息，文件实体中定义的key/value的起止位置，确定如何解析数据。
+
+还可以参考： 
+http://www.cnblogs.com/yangsy0915/p/5559678.html
+http://hadooptutorial.info/reading-and-writing-sequencefile-example/
+
+通常可以直接使用[SequenceFileInputFormat](http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/input/SequenceFileInputFormat.html)和[SequenceFileOutputFormat](http://hadoop.apache.org/docs/stable/api/org/apache/hadoop/mapreduce/lib/output/SequenceFileOutputFormat.html)。

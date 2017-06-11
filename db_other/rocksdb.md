@@ -80,7 +80,6 @@ doc/index.html
 https://github.com/facebook/rocksdb/wiki
 https://github.com/facebook/rocksdb/tree/master/examples
 
-
 ## Java接口参考资料
 
 https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
@@ -88,16 +87,16 @@ java/src/test
 java/samples
 java/target/apidocs/ （编译之后）
 
+## 限制
 
+根据[RocksDB Basics](https://github.com/facebook/rocksdb/wiki/rocksdb-basics): There is no limit to the size of a key or a value. 
+但是如果key/value的size过大，对性能可能有影响。
+另可参考： https://github.com/facebook/rocksdb/issues/513
 
-uodown调整monitor2obj的导出逻辑后：
-不限制IP个数（整数），约90分钟。LevelDB 10.7G。
-限制单个trace文件、单个路由器8个目标IP（整数），约40分钟。LevelDB 836M。
-限制单个trace文件、单个路由器8个目标IP（字符串），parse/merge/m2obj线程配置为12/8/20，约44分钟。LevelDB 1.2G。
+## 相关项目
 
+[pika](https://github.com/Qihoo360/pika)，兼容redis的分布式存储，底层存储是rocksdb的变种。
 
-加速：
-	BatchWrite
 
 ## 常用工具
 
