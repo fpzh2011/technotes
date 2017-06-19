@@ -688,6 +688,11 @@ Python中管理第三方包有两种方式，`pip`和`easy_install`。
 
 在ipython中运行python脚本文件：`run test.py`
 
+## __future__
+
+学习手册，P593
+https://docs.python.org/2/library/__future__.html
+
 ## 问题
 
 如何将异常信息打印到stderr？
