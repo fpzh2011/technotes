@@ -95,7 +95,7 @@ print j['two']
 print j.keys()
 
 ### 从文件解析
-with open('data.json') as data_file:    
+with open('data.json') as data_file:
 	data = json.load(data_file)
 ```
 
@@ -384,6 +384,34 @@ Python貌似没有数组类型。list就是可以动态扩展的数组。
 在Python3中，map、filter、reduce都是可迭代对象；而在Python2中都不是可迭代对象，map、filter直接返回列表，reduce返回计算结果。（学习手册P489）
 可以用`itertools.imap`和`itertools.ifilter`返回generator object。`reduce`还没有发现可以返回generator object的版本。
 
+```python
+a = [(1, 2, 3)]
+# b是元组
+for b in a:
+	print b
+# b,c,d 解开元组
+for b,c,d in a:
+	print b,c,d
+'''
+变量个数要么是1，要么与元组的元素个数相同，否则错误
+for b,c in a:
+	print b,c
+'''
+
+a = [[1,2,3]]
+# b是列表
+for b in a:
+	print b
+# b,c,d 解开列表
+for b,c,d in a:
+	print b,c,d
+'''
+变量个数要么是1，要么与列表的元素个数相同，否则错误
+for b,c in a:
+	print b,c
+'''
+```
+
 ### None类型
 
 [None](https://docs.python.org/2/library/constants.html#None)是[types.NoneType](https://docs.python.org/2/library/types.html#types.NoneType)类型的singleton对象。任何对`None`的赋值、添加属性等操作都会报错；手动创建`types.NoneType`对象也会报错。
@@ -414,13 +442,60 @@ Python不支持`++`操作符，但支持`a += 1`操作符。
 
 ## 类class
 
+### 静态属性
 类的静态属性（数据成员）。直接对类的属性进行赋值，就可以创建类的静态属性，如`A.a = 1`，或者在类定义的顶层赋值，如`calss A: x = 1`（P699）。
+
+### 静态方法、类方法
+
 类的静态方法，在`def`语句前一行添加`@staticmethod`修饰符（P691,796）。参考：https://docs.python.org/2/library/functions.html#staticmethod
+
+类的类方法，在`def`语句前一行添加`@classmethod  `修饰符。
+
+[静态方法与类方法的区别](http://blog.csdn.net/handsomekang/article/details/9615239)：
+* `@classmethod`不需要表示对象自身的`self`参数，但第一个参数需要是表示类自身的`cls`参数。
+* `@staticmethod`不需要表示对象自身的`self`参数，也不需要表示类自身的`cls`参数，就跟调用普通函数一样。
+示例如下：
+```python
+class A(object):
+    bar = 1
+    def foo(self):
+        print 'foo'
+ 
+    @staticmethod
+    def static_foo():
+        print 'static_foo'
+        print A.bar
+ 
+    @classmethod
+    def class_foo(cls):
+        print 'class_foo'
+        print cls.bar
+        cls.static_foo()
+        cls().foo()
+
+A.static_foo()
+A.class_foo()
+```
 
 ### 抽象超类
 
 P695-697
-Python2中，类如果包含用`@abstractmethod`修饰的成员函数，就是成员类，该成员函数的具体实现由子类提供。
+Python2中，类如果包含用[@abstractmethod](https://docs.python.org/2/library/abc.html)修饰的成员函数，就是成员类，该成员函数的具体实现由子类提供。
+
+Python中有三种方法实现，一种是在方法中使用`assert`语句，第二种是在方法中抛出`NoImplementedError`异常，但这两种方法都可以创建对象，只是不能调用方法。
+第三种方法利用`@abstractmethod`，如果没有实现所有`@abstractmethod`修饰的方法，无法创建对象。示例如下：
+```python
+# abc: abstract base class
+from abc import ABCMeta, abstractmethod
+
+class C():
+	# __metaclass__ 的设置是必需的，否则仍可以创建对象
+	__metaclass__ = ABCMeta
+
+	@abstractmethod
+	def f(self):
+		pass
+```
 
 ### 新式类
 
@@ -679,6 +754,18 @@ https://www.quora.com/Whats-the-best-MySQL-library-for-Python
 ```python
 c.execute("SELECT * FROM foo WHERE bar = %s AND baz = %s", (param1, param2))
 ```
+
+## 线程
+
+一般推荐使用threading库，thread库声明为deprecated。
+http://www.python-course.eu/threads.php
+
+http://www.runoob.com/python/python-multithreading.html
+http://python.jobbole.com/81546/
+https://pymotw.com/2/threading/
+http://effbot.org/zone/thread-synchronization.htm
+https://docs.python.org/2/library/threading.html
+https://docs.python.org/2/library/thread.html
 
 ## 第三方包管理
 

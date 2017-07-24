@@ -205,7 +205,11 @@ http://stackoverflow.com/questions/612097/how-can-i-get-the-list-of-files-in-a-d
 /usr/include/asm-generic/errno-base.h
 /usr/include/asm-generic/errno.h
 
+## 常用I/O流对象是RAII类
 
+比如`ifstream, ofstream`都不必手动`close()`，析构函数会执行关闭操作。
+https://stackoverflow.com/questions/748014/do-i-need-to-manually-close-an-ifstream
+Effective Modern C++, P253
 
 
 

@@ -107,6 +107,92 @@ int main() {
 }
 ```
 
+## 线程
+
+主线程退出后，`detach`的线程也会被终止、不会抛异常。
+如果`thread`的析构函数运行时，线程是`joinable`的，比如正在运行，标准库会调用`terminate()`终止整个程序。相关分析可参考 Effective Modern C++, P252 。
+`t.join()`会阻塞调用线程的执行，等待`t`执行完毕、退出后，调用线程才会继续执行。
+
+```cpp
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+void f(){
+	int i = 0;
+	while(true) {
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::cout << (++i) << std::endl;
+	}
+}
+
+int main() {
+	std::thread t(f);
+	//如果没有detach也不join，主线程退出会抛异常
+	//参考std::thread::~thread()的说明
+	t.detach();
+	std::this_thread::sleep_for(std::chrono::seconds(8));
+	std::cout << "main exit" << std::endl;
+	return 0;
+}
+```
+
+## 类的几种常用函数
+
+```cpp
+#include <iostream>
+
+class Wiget {
+public:
+	Wiget() {
+		std::cout << "Wiget default constructor" << std::endl;
+	}
+
+	Wiget(const std::string &s) {
+		std::cout << "Wiget string constructor. s=" << s << std::endl;
+	}
+
+	Wiget(const Wiget &w) {
+		std::cout << "Wiget copy constructor" << std::endl;
+	}
+
+	Wiget(Wiget&& w) noexcept {
+		std::cout << "Wiget move copy constructor" << std::endl;
+	}
+
+	Wiget& operator=(const Wiget &w) {
+		std::cout << "Wiget copy assignment" << std::endl;
+		return *this;
+	}
+
+	Wiget& operator=(Wiget&& w) noexcept {
+		std::cout << "Wiget move copy assignment" << std::endl;
+		if(this != &w) {
+			std::cout << "\tfree this resource, assume parameter w's resource" << std::endl;
+		}
+		return *this;
+	}
+};
+
+int main() {
+	Wiget w;
+	const Wiget w2("abc");
+	auto w3 = w2;
+	w = w3;
+	Wiget w4(std::move(w));
+	w3 = std::move(w3);
+	w3 = std::move(w4);
+	return 0;
+}
+```
+
+
+
+
+
+
+
+
 ## 开源项目
 
 leveldb https://github.com/google/leveldb
