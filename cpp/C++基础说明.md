@@ -186,7 +186,28 @@ int main() {
 }
 ```
 
+## 自定义类型、函数返回值、左值、右值
 
+如果函数返回的是引用，返回值是左值（C++ Primer, P202）；否则，返回值一般是右值。
+如果函数返回的是内置类型如`int`，返回值不能被赋值。但如果函数返回的是类类型，返回值可以被赋值，可以引用返回值数据成员，但是不能对返回值的数据成员赋值。（Effective C++, P19）
+```cpp
+#include <iostream>
+
+int f() { return 0; }
+
+struct block { int x; };
+
+block f2() { return block(); }
+
+int main() {
+	//拷贝赋值成员函数 N3936, §3.10/5
+	f2() = block();
+	std::cout << f2().x << std::endl;
+	//f2().x = 1; //编译错误
+	//f() = 1; //编译错误
+	return 0;
+}
+```
 
 
 
