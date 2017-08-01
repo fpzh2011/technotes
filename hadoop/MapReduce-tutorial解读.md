@@ -162,7 +162,7 @@ MapReduce框架为每个`InputSplit`生成一个map task。
 
 在`Mapper.run()`方法中：
 * 首先调用`Mapper.setup()`方法.
-* 然后，通过`Context获取`InputSplit`中的每个key/value pair，并调用`Mapper.map()`方法，`map`方法一次处理一个key/value pair。
+* 然后，通过`Context`获取`InputSplit`中的每个key/value pair，并调用`Mapper.map()`方法，`map`方法一次处理一个key/value pair。
 * 最后调用`Mapper.cleanup()`方法。
 一个`Mapper`对象如果多次调用`run`方法，就可能处理多个`InputSplit`，具体要看框架实现。
 
