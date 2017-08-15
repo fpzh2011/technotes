@@ -209,7 +209,28 @@ int main() {
 }
 ```
 
+## 引用折叠
 
+C++ Primer, P608
+
+```cpp
+#include <iostream>
+
+//f的模版参数是右值引用。
+//如果调用f的实参是左值，T被解析为左值引用，可以更改实参的值。
+template <typename T> void f(T&& t) {
+	T v = t;
+	v = 3;
+}
+
+int main() {
+	int i = 1;
+	std::cout << i << std::endl;
+	f(i);
+	std::cout << i << std::endl;
+	return 0;
+}
+```
 
 
 

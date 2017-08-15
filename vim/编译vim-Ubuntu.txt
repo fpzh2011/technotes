@@ -5,8 +5,6 @@ https://github.com/wongsyrone/vim_files
 http://www.vimer.cn/2009/10/在vimgvim中使用cscope.html
 http://coolshell.cn/articles/11312.html
 
-
-
 之前可以先装vim，以自动安装依赖的包。
 
 sudo apt remove vim-tiny
@@ -21,15 +19,28 @@ CentOS:
 sudo yum install mercurial cscope ctags ncurses-devel libgnome-devel libgnomeui-devel gtk2-devel atk-devel libbonoboui-devel cairo-devel libX11-devel libXpm-devel libXt-devel python-devel
 
 
-./configure --help
+**ubuntu16.04.3**
+# 检查ruby和lua是否已经安装、安装的版本、动态库路径
+sudo apt install lua5.2 liblua5.2-dev
+sudo ln -s /usr/lib/x86_64-linux-gnu/libperl.so.5.22.1 /usr/lib/x86_64-linux-gnu/libperl.so
+sudo ln -s /usr/lib/liblua50.so.5.0 /usr/lib/liblua5.0.3.so
 
+编译vim7.4
+	https://github.com/yangyangwithgnu/use_vim_as_ide
+	sudo apt install python-dev python3-dev ruby-dev liblua50-dev libx11-dev libgtk2.0-dev libgtk-3-dev ncurses-dev exuberant-ctags libxpm-dev libxt-dev xutils-dev cscope
 
+	./configure --help
+	configure的日志：src/auto/config.log
 
+	./configure LDFLAGS="-L/usr/lib/x86_64-linux-gnu" \
+	--with-features=huge --enable-pythoninterp --enable-python3interp --enable-rubyinterp --enable-luainterp --enable-perlinterp \
+	--with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/ \
+	--with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ \
+	--enable-xim --enable-fontset \
+	--enable-gui=gtk2 --enable-cscope --prefix=/usr
+	
+	make
+	sudo make install
 
-./configure --prefix=/usr/local --with-features=huge --enable-cscope --enable-xim --enable-fontset
-
-make
-
-sudo make install
 
 
