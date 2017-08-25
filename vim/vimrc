@@ -28,7 +28,7 @@ Plugin 'Lokaltog/vim-powerline'
 call vundle#end()            " required
 filetype plugin indent on    " required
 
-let mapleader=";"
+let mapleader=","
 
 " tagbar设置
 let tagbar_left=1 " 设置 tagbar 子窗口的位置出现在主编辑区的左边
@@ -77,6 +77,20 @@ let NERDTreeWinPos="right"	" 设置NERDTree子窗口位置
 let NERDTreeShowHidden=1		" 显示隐藏文件
 let NERDTreeMinimalUI=1		" NERDTree 子窗口中不显示冗余帮助信息
 let NERDTreeAutoDeleteBuffer=1	" 删除文件时自动删除文件对应 buffer
+
+" Window utility ================================================================
+" Make C-W safe in the insert mode
+imap <C-W> <C-O><C-W>
+
+" Easy splitted window navigation
+noremap <C-h>  <C-w>h
+noremap <C-j>  <C-w>j
+noremap <C-k>  <C-w>k
+noremap <C-l>  <C-w>l
+
+" Splits ,v and ,h to open new splits (vertical and horizontal)
+nnoremap <leader>v <C-w>v<C-w>l
+nnoremap <leader>h <C-w>s<C-w>j
 
 "自己定义 =======================================================================
 syntax on		"打开语法高亮
