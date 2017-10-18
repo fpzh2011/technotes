@@ -15,6 +15,7 @@ yum安装时需要输入口令，如 `rootpwd`
 	
 	[mysqld]
 	character-set-server=utf8
+	lower_case_table_names=1
 
 	[client]
 	default-character-set=utf8
@@ -27,6 +28,49 @@ yum安装时需要输入口令，如 `rootpwd`
 	show variables like 'character%';
 
 另外，可以参考 CH 5.1.4 Server System Variables；以及 CH 4.2.6 Using Option Files，这里列出了配置文件的地址，以及基本配置方法。
+
+## Unicode问题
+
+https://stackoverflow.com/questions/13653712/
+https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-conversion.html
+mysql对unicode仅支持basic multilingual plane。有些同步的表中包含表情字符，比如 😊 ，不在basic multilingual plane中。
+解决办法是设置字符集为 utf8mb4 ，支持4字节编码。尤其是要修改数据库（以及table）和客户端的字符集。如果数据库已经是utf8mb4，Server的字符集可以是utf8。
+参考的配置如下：
+```
+[mysqld]
+character-set-server=utf8
+[client]
+default-character-set=utf8mb4
+```
+对于JDBC，如果服务端没有设置，还需要执行`SET NAMES utf8mb4`。因为JDBC驱动没有utf8mb4的字符集参数，只有`UTF-8`。
+https://dev.mysql.com/doc/refman/5.7/en/charset-connection.html
+
+```sql
+-- 修改字符集
+ALTER database sxs DEFAULT CHARACTER SET utf8mb4;
+
+ALTER TABLE t1 DEFAULT CHARACTER SET utf8mb4;
+
+ALTER TABLE company
+  DEFAULT CHARACTER SET utf8mb4,
+  MODIFY status VARCHAR(32)
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
+
+-- 查看字符集 https://stackoverflow.com/questions/1049728/
+SELECT default_character_set_name FROM information_schema.SCHEMATA 
+WHERE schema_name = "sxs";
+
+SELECT CCSA.character_set_name FROM information_schema.`TABLES` T,
+       information_schema.`COLLATION_CHARACTER_SET_APPLICABILITY` CCSA
+WHERE CCSA.collation_name = T.table_collation
+  AND T.table_schema = "sxs"
+  AND T.table_name = "resume";
+
+SELECT character_set_name FROM information_schema.`COLUMNS` 
+WHERE table_schema = "sxs"
+  AND table_name = "resume"
+  AND column_name = "uuid";
+```
 
 # 启动/停止数据库
 
@@ -68,6 +112,14 @@ p之后直接回车，以密文传输口令。也可以在p之后空格间隔dbN
 
 	select * from test;
 
+增加字段：
+ALTER TABLE tag_intern 
+  ADD c1 varchar(10),
+  ADD c2 varchar(10);
+删除索引：`alter table resume drop index uuid; --uuid is column name`
+创建索引：`alter table tag_intern add unique index idx_name2 (id);`
+查询索引：`show index from resume;`
+
 执行Sql脚本
 
 	登录mysql后执行：
@@ -104,6 +156,17 @@ load data local infile 'myfile' into table mytable fields terminated by ',' line
 
 http://www.cnblogs.com/ggjucheng/archive/2012/11/05/2755683.html
 https://dev.mysql.com/doc/refman/5.7/en/load-data.html
+
+## JDBC
+
+[mysql的JDBC驱动默认一次性读取ResultSet的全部数据](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-implementation-notes.html)
+如果查询大数据集，可参考如下代码：
+```java
+conn = DriverManager.getConnection("jdbc:mysql://localhost/?useCursorFetch=true", "user", "s3cr3t");
+stmt = conn.createStatement();
+stmt.setFetchSize(100);
+rs = stmt.executeQuery("SELECT * FROM your_table_here");
+```
 
 # 疑问
 

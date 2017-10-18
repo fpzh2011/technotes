@@ -1,5 +1,12 @@
 # bash基础
 
+## 切换shell
+
+```shell
+# restarted
+chsh -s $(which zsh)
+```
+
 ## 重定向
 
 ### Here Documents
@@ -46,6 +53,15 @@ a="test a var"
 echo $a
 func1
 echo $b
+```
+
+### 变量引用形式
+
+```shell
+v="this is a test"
+echo $v
+echo ${v}
+echo ${1} # 命令行第一个参数
 ```
 
 ## 函数与调试

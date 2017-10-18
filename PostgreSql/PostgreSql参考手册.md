@@ -176,10 +176,19 @@ GROUP_CONCAT可以连接字符串。（P1672）
 
 支持 COALESCE()、GREATEST()、LEAST()、ISNULL()、
 
+# 常用命令
+
+```sql
+--查看库表结构
+\d tablename
+-- 退出
+\q
+```
+
+
 # 不支持的弱项
 
 不支持 full outer join ； 不支持 row_number/rank_number 等分析窗口函数；貌似不支持 with as 语句。
-
 
 ## 数据类型转换
 

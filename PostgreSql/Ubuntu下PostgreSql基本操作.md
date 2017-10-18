@@ -47,12 +47,27 @@ CREATE TABLE zjh.idc_scan
 );
 ```
 
-## 数据导入
+## 增加字段
 
 ```sql
+alter table intern add column id numeric(4,0);
+
+alter table intern 
+  add column id2 numeric(4,0),
+add column id3 numeric(4,0);
+```
+
+
+## 数据导入、导出
+
+```sql
+-- server side
 COPY my_table FROM 'C:/Users/testUser/Desktop/TSV/ratings.list.tsv' DELIMITER '\t';
 COPY zjh.idc_scan FROM '/var/lib/postgresql/idc_scan_parse';
 COPY (SELECT * FROM zjh.idc_scan) TO '/var/lib/postgresql/idc.copy';
+
+-- client side
+\copy (select distinct job from intern) To '/tmp/test.csv' With CSV
 ```
 
 数据最好放到用户postgres的home目录，并将owner改为 postgres 。
@@ -95,24 +110,6 @@ http://www.cnblogs.com/sekihin/archive/2009/01/14/1375329.html
 ## 权限
 
 https://github.com/digoal/blog/blob/master/201605/20160510_01.md
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## 参考资料
 
@@ -286,6 +283,54 @@ INET_ATON()将IP地址转换为数字。（P1662）
 GROUP_CONCAT可以连接字符串。（P1672）
 
 支持 COALESCE()、GREATEST()、LEAST()、ISNULL()、
+
+# 常用命令
+
+`sql
+--查看所有库表
+\d
+--查看库表结构
+\d table_name
+--列出所有库表
+\list
+--切换数据库
+\c dbname
+`
+
+## 统计表、索引所占空间
+
+```sql
+-- 表+索引
+SELECT pg_size_pretty(pg_total_relation_size('resume_deliver'));
+-- 表
+SELECT pg_size_pretty(pg_table_size('resume_deliver'));
+-- 索引
+SELECT pg_size_pretty(pg_indexes_size('resume_deliver'));
+
+-- 所有表
+SELECT
+    table_name,
+    pg_size_pretty(table_size) AS table_size,
+    pg_size_pretty(indexes_size) AS indexes_size,
+    pg_size_pretty(total_size) AS total_size
+FROM (
+    SELECT
+        table_name,
+        pg_table_size(table_name) AS table_size,
+        pg_indexes_size(table_name) AS indexes_size,
+        pg_total_relation_size(table_name) AS total_size
+    FROM (
+        SELECT ('"' || table_schema || '"."' || table_name || '"') AS table_name
+        FROM information_schema.tables
+    ) AS all_tables
+    ORDER BY total_size DESC
+) AS pretty_sizes;
+```
+
+## JDBC
+
+查询时ResultSet默认一次性获取所有数据。
+[By default the driver collects all the results for the query at once.](https://jdbc.postgresql.org/documentation/head/query.html)
 
 # 不支持的弱项
 

@@ -329,6 +329,16 @@ a = u'中国'
 print a, a.__class__.__name__
 ```
 
+### unicode码转换
+
+```python
+import json
+s = '{"msg": "\u65e0\u6b64\u7b80\u5386!", "code": 500}'
+j = json.loads(s)
+print j.get('msg').__class__.__name__
+print j.get('msg')
+```
+
 ### 整数
 
 Python对整数的大小在逻辑上没有限制，只有一些物理限制，如不能超过内存大小。
@@ -588,6 +598,31 @@ http://blog.csdn.net/fxjtoday/article/details/6307285
 http://crazier9527.iteye.com/blog/290018
 https://docs.python.org/2/library/logging.html
 
+[多线程输出同步](https://docs.python.org/2/library/logging.html#thread-safety)
+[multiprocessing的日志同步](https://stackoverflow.com/questions/641420/how-should-i-log-while-using-multiprocessing-in-python)
+
+[API文档](https://docs.python.org/2.6/library/logging.html)
+```python
+# -*- coding:utf-8 -*-
+
+import logging
+import logging.handlers
+
+logger = logging.getLogger("test-log")
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler("my.log",  encoding='utf8')
+# TimedRotatingFileHandler
+#handler = logging.handlers.RotatingFileHandler("my.log", maxBytes=100*1024*1024, encoding='utf8')
+# Console
+# handler = logging.StreamHandler(sys.stdout)
+
+# 输出级别，时间，[模块，文件，函数，行号]，消息
+formatter = logging.Formatter("%(levelname)s %(asctime)s [%(module)s %(filename)s %(funcName)s %(lineno)d] %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.info(u"abc 中国")
+```
+
 ## 循环
 
 Python中的for只能处理序列（学习手册，P343）。当Python运行for循环时，会逐个将序列中的元素赋值给目标。注意，是赋值，不是引用（学习手册，P344，P353）。
@@ -697,6 +732,13 @@ a, b = b, a #swap
 ```
 参考 Python学习手册 P294，序列赋值。
 
+## numpy
+
+`numpy`依赖的数值计算库：
+* lapack
+* blas
+* atlas
+
 ## ipython
 
 安装：`sudo pip install ipython`
@@ -751,7 +793,14 @@ https://www.quora.com/Whats-the-best-MySQL-library-for-Python
 貌似不支持PreparedStatement: https://stackoverflow.com/questions/1947750/does-python-support-mysql-prepared-statements
 
 查询参数 https://stackoverflow.com/questions/775296/python-mysql-parameterized-queries
+
 ```python
+import MySQLdb
+db = MySQLdb.connect('host', 'user', 'pwd', 'database', connect_timeout=5, charset='utf8mb4')
+cursor = db.cursor()
+cursor.execute('select name from resume where name is not null limit 1')
+row = cursor.fetchone()
+# 查询参数
 c.execute("SELECT * FROM foo WHERE bar = %s AND baz = %s", (param1, param2))
 ```
 
@@ -766,6 +815,22 @@ https://pymotw.com/2/threading/
 http://effbot.org/zone/thread-synchronization.htm
 https://docs.python.org/2/library/threading.html
 https://docs.python.org/2/library/thread.html
+
+### gil
+
+如果使用 CPython ，因为[gil](https://docs.python.org/2/glossary.html#term-global-interpreter-lock)的存在，同一时间只有一个物理线程执行，这时多线程比较适合 I/O 较多的场景，比如 Web 应用。
+
+计算密集型任务如果想摆脱gil的限制，有以下几种方式：
+* 使用[multiprocessing](https://docs.python.org/2/library/multiprocessing.html#module-multiprocessing)
+* 使用JPython等实现。
+* 使用C扩展处理计算瓶颈。
+* 使用Lua计算。
+
+### 多线程I/O输出同步问题
+
+简单的可以考虑[logging](https://docs.python.org/2/library/logging.html#thread-safety)
+
+[multiprocessing的日志同步](https://stackoverflow.com/questions/641420/how-should-i-log-while-using-multiprocessing-in-python)
 
 ## 第三方包管理
 

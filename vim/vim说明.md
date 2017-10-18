@@ -164,3 +164,12 @@ bw 关闭当前缓冲区文件。
 	https://en.wikipedia.org/wiki/Vim_(text_editor)
 	http://coolshell.cn/articles/11312.html
 
+## session
+
+```
+:mksession ~/srv.vim
+:source ~/srv.vim
+$ vim -S ~/srv.vim
+```
+
+
