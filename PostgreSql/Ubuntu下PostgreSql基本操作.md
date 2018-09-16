@@ -291,7 +291,7 @@ GROUP_CONCAT可以连接字符串。（P1672）
 \d
 --查看库表结构
 \d table_name
---列出所有库表
+--列出所有数据库
 \list
 --切换数据库
 \c dbname

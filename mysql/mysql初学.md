@@ -12,16 +12,19 @@ yum安装时需要输入口令，如 `rootpwd`
 	set names utf8;
 	
 创建配置文件 `/etc/mysql/conf.d/zjh.cnf` （rhel7-mariadb是 `/etc/my.cnf.d/`，Ubuntu16是`/etc/mysql/mysql.conf.d/`，mysql5.7则要使用include指令）：
-	
-	[mysqld]
-	character-set-server=utf8
-	lower_case_table_names=1
 
-	[client]
-	default-character-set=utf8
+```
+[mysqld]
+character-set-server=utf8
+lower_case_table_names=1
+sql-mode=""
 
-	[mysql]
-	default-character-set=utf8
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+```
 
 显示字符集设置（如果提示Table 'performance_schema.session_variables' doesn't exist，停止mysql数据库，运行`mysql_upgrade -u root -p --force`，再重启数据库）
 
@@ -33,6 +36,7 @@ yum安装时需要输入口令，如 `rootpwd`
 
 https://stackoverflow.com/questions/13653712/
 https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-conversion.html
+https://dev.mysql.com/doc/refman/5.7/en/charset-connection.html
 mysql对unicode仅支持basic multilingual plane。有些同步的表中包含表情字符，比如 😊 ，不在basic multilingual plane中。
 解决办法是设置字符集为 utf8mb4 ，支持4字节编码。尤其是要修改数据库（以及table）和客户端的字符集。如果数据库已经是utf8mb4，Server的字符集可以是utf8。
 参考的配置如下：
@@ -70,6 +74,15 @@ SELECT character_set_name FROM information_schema.`COLUMNS`
 WHERE table_schema = "sxs"
   AND table_name = "resume"
   AND column_name = "uuid";
+
+-- utf8mb4_unicode_ci
+SELECT column_name, COLLATION_NAME FROM information_schema.`COLUMNS` 
+WHERE table_schema = "main"
+  AND table_name = "resume_deliver"
+  AND column_name like "%uuid%";
+
+-- 查询时指定字段的字符集
+select * from tag_resume where resume_uuid in ('😊' COLLATE utf8mb4_general_ci,'a' COLLATE utf8mb4_general_ci);
 ```
 
 # 启动/停止数据库
@@ -85,13 +98,14 @@ WHERE table_schema = "sxs"
 
 # 登录服务器
 
-	mysql -h localhost -u root -p
+	mysql --default-character-set=utf8mb4 -h localhost -u root -p
 
 p之后直接回车，以密文传输口令。也可以在p之后空格间隔dbName。
 
 # 创建/打开/删除数据库
 
 	create database zjh;
+	CREATE DATABASE sxs CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 	drop database zjh;
 
 显示已经创建的数据库
@@ -134,9 +148,23 @@ ALTER TABLE tag_intern
 
 	select now(), curdate(), curtime() from dual;
 
-查询版本、当前数据库、连接等状态信息 
+## 查询版本、当前数据库、连接等状态信息 
 
-	status;
+```
+status;
+show status like 'Conn%';
+SHOW VARIABLES LIKE 'max_connections';
+```
+
+## udpate select
+
+https://stackoverflow.com/questions/1262786/mysql-update-query-based-on-select-query
+```sql
+update next_question_log a
+join suite_temp b on a.sessionId = b.sessionId
+set a.suiteId = b.suiteId;
+-- where clause can go here
+```
 
 ## 从shell发起命令
 
@@ -157,6 +185,69 @@ load data local infile 'myfile' into table mytable fields terminated by ',' line
 http://www.cnblogs.com/ggjucheng/archive/2012/11/05/2755683.html
 https://dev.mysql.com/doc/refman/5.7/en/load-data.html
 
+### 导出数据
+
+```
+# shell
+# dump schema def & data
+mysqldump -h localhost \
+	-u root -p \
+	--databases main --default-character-set=utf8mb4 \
+	--tables tb1 tb2 \
+	> export.sql
+# only schema def
+mysqldump -h localhost -d \
+        -u root -p \
+        --databases zjh \
+        --tables question question_kn question_suite \
+        > def.sql
+```
+
+### 导出查询结果
+
+```sql
+select *, s.delay - a.delay diff
+from 
+	( 
+	select substring(stime,1,5) time, round(avg(delay),3) delay from sxs 
+	group by time
+	) s,
+	(
+	select substring(stime,1,5) time, round(avg(delay),3) delay from ali 
+	group by time
+	) a
+where s.time = a.time
+INTO OUTFILE '/var/lib/mysql-files/delay.csv'
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n';
+```
+
+### 导入数据
+
+```
+mysql -h localhost -D main -u root -p < export.sql
+```
+
+## 抽取json字段
+
+https://dev.mysql.com/doc/refman/8.0/en/json.html
+```sql
+SELECT name, tags->"$[0]" AS `tag1` FROM `book`;
+SELECT name, profile->"$.twitter" AS `twitter` FROM `user`;
+```
+
+## virtual column
+
+```sql
+create table test (
+...
+`qPk` VARCHAR(256) GENERATED ALWAYS AS (concat(clientKey,'_',suiteId,'_',lastAnswer->"$.qid")) VIRTUAL
+);
+
+ALTER TABLE next_question_log ADD `qPk` VARCHAR(256) GENERATED ALWAYS AS (concat(clientKey,'_',suiteId,'_',lastAnswer->"$.qid")) VIRTUAL;
+```
+
 ## JDBC
 
 [mysql的JDBC驱动默认一次性读取ResultSet的全部数据](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-implementation-notes.html)
@@ -167,6 +258,33 @@ stmt = conn.createStatement();
 stmt.setFetchSize(100);
 rs = stmt.executeQuery("SELECT * FROM your_table_here");
 ```
+
+### batch
+
+https://stackoverflow.com/questions/14264953/how-is-jdbc-batch-update-helpful
+https://stackoverflow.com/questions/26307760/mysql-and-jdbc-with-rewritebatchedstatements-true
+https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-configuration-properties.html
+https://www.journaldev.com/2494/jdbc-batch-insert-update-mysql-oracle
+https://mariadb.com/resources/blog/mariadb-java-connector-driver-performance
+https://blog.jooq.org/2014/01/16/what-you-didnt-know-about-jdbc-batch/
+
+## python
+
+```python
+import MySQLdb
+# fetch size || cursor
+# https://stackoverflow.com/questions/337479/how-to-get-a-row-by-row-mysql-resultset-in-python
+import MySQLdb.cursors
+MySQLdb.connect(user="root", passwd="root", db="sxs", cursorclass = MySQLdb.cursors.SSCursor)
+```
+
+## 连接丢失，time out
+
+https://dev.mysql.com/doc/refman/8.0/en/gone-away.html
+
+## history命令历史记录
+
+`more ~/.mysql_history`
 
 # 疑问
 

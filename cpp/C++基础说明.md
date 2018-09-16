@@ -232,8 +232,37 @@ int main() {
 }
 ```
 
+## 不测试私有方法的几个原因
 
+* 如果没有更改public接口，而只修改了内部实现，不应删除原有测试代码。
+* 测试私有方法表明类承担多项职责：公共的，私有的。
+https://stackoverflow.com/questions/3676664/unit-testing-of-private-methods
+https://github.com/google/googletest/blob/master/googletest/docs/AdvancedGuide.md#testing-private-code
+https://www.artima.com/suiterunner/privateP.html
 
+## 浮点数比较
+
+https://stackoverflow.com/questions/17333/what-is-the-most-effective-way-for-float-and-double-comparison
+https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
+
+### 最小浮点数
+
+目前已知的double最小正数，与python结果一致：
+```cpp
+#include <iostream>
+#include <limits>
+#include <cfloat>
+
+int main() {
+  std::cout << std::numeric_limits<double>::epsilon() << std::endl;
+  std::cout << DBL_EPSILON << std::endl;
+  std::cout << DBL_MIN << std::endl;
+  std::cout << DBL_MIN*DBL_EPSILON << std::endl;
+  std::cout << 1.0/(DBL_MIN*0.27) << std::endl;
+  return 0;
+}
+```
+有没有更可靠的方法防止除法出现inf？
 
 ## 开源项目
 

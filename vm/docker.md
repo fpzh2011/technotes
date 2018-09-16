@@ -27,6 +27,7 @@ https://jiajially.gitbooks.io/dockerguide/content/chapter_fastlearn/index.html
 https://hujb2000.gitbooks.io/docker-flow-evolution/content/cn/index.html
 
 ### 用户定义网络
+
 https://stackoverflow.com/questions/41768157/how-to-link-container-in-docker
 https://stackoverflow.com/questions/32744509/docker-network-link-to-2-or-multiple-containers
 
@@ -114,6 +115,87 @@ https://www.1and1.com/cloud-community/learn/containers/docker/using-redis-in-doc
 https://stackoverflow.com/questions/25101312/does-all-running-docker-containers-have-a-separate-process-id
 `docker inspect --format '{{ .State.Pid }}' CONTAINER_ID`
 
+## logrotate配置
+
+Dockerfile
+```
+RUN apt-get update &&\
+  apt-get -y install --no-install-recommends cron logrotate &&\
+  rm -f /etc/cron.d/logrotate /etc/cron.d/dpkg /etc/cron.d/apt-compat /etc/cron.d/passwd
+COPY logrotate.conf /etc/logrotate.d/nginx
+```
+
+logrotate.conf
+```conf
+/var/log/nginx/access.log /var/log/nginx/error.log {
+  compress
+  daily
+  dateext
+  dateyesterday
+  delaycompress
+  missingok
+  nocreate
+  notifempty
+  rotate 2
+  sharedscripts
+  postrotate
+    test ! -f /var/run/nginx.pid || kill -USR1 `cat /var/run/nginx.pid`
+  endscript
+}
+```
+
+nginx start.sh
+```shell
+chmod 0644 /etc/logrotate.d/nginx
+service cron start
+echo "0 0 * * * /usr/sbin/logrotate -f /etc/logrotate.d/nginx" | crontab -
+echo "0 0 * * * /usr/sbin/logrotate -f /etc/logrotate.d/nginx" > /etc/cron.d/my.conf
+```
+
+# docker save/export
+
+`docker save/load`针对镜像，`docker export/import`针对容器。
+https://my.oschina.net/zjzhai/blog/225112
+https://docs.docker.com/engine/reference/commandline/save/
+https://docs.docker.com/engine/reference/commandline/export/
+
+## 查看build层次
+
+```shell
+docker history docker-image:tag
+```
+
+## docker镜像拷贝
+
+```shell
+docker commit -a 'zhengjh' -m 'comments' containerId deepro.io/adaptive/recommend:2.0.0
+docker images | grep recommend
+docker save deepro.io/adaptive/recommend:2.0.0 > recommend.tar
+docker load -i recommend.tar
+# export container
+docker export -o container.tar containerId
+```
+https://stackoverflow.com/questions/22655867/what-is-the-difference-between-save-and-export-in-docker
+https://my.oschina.net/zjzhai/blog/225112
+
+## 网络
+
+swarm的compose文件中：
+* expose是overlay网络
+* ports但没有`mode host`是ingres网络
+* ports且有`mode host`是host网络
+
+### 网络问题
+
+docker 17.09
+vertx 3.5.0
+
+如果使用overlay网络，运行一段时间后，对mysql服务（？）的域名解析报错`no route to host`。但是从nginx到vertx好像没有问题。
+应该是DNS解析到IP，但是docker网络的路由出现问题。
+对docker service的域名访问没问题，nginx->vertx一直是通过service name访问。
+
+如果使用host网络，因为docker中`ndots=0`，如果有`search domain`，查询hostname的IP会报错（service name正常）。禁止vertx的dns，或者使用完整域名都可以解决。
+
 ## 问题
 
 如果宿主机用`sudo docker network create sxs`创建了网络，启动docker容器时如果不指定网络，可能无法连接外网。
@@ -125,7 +207,15 @@ http://dockone.io/question/154
 RUN sed -i 's/http:\/\/archive\.ubuntu\.com\/ubuntu\//http:\/\/mirrors\.163\.com\/ubuntu\//g' /etc/apt/sources.list
 RUN sed -i 's#http://archive\.ubuntu\.com/ubuntu/#http://mirrors\.163\.com/ubuntu/#g' /etc/apt/sources.list
 `
-sed #
+
+### docker pull TLS handshake timeout
+
+在`/etc/default/docker`中设置代理服务器。
+```
+error pulling image configuration: Get https://dseasb33srnrn.cloudfront.net/registry-v2/docker/registry/v2/blobs/sha256/39/3926e5aac017cdd47961dccb8dcb83fc1789ec1ccfefcaa4f03f81aa4c10a3c8/data?Expires=1523452885&
+Signature=FiF5jr~2Vy-FGLPUeRvkRv6~K66cRPqBfNsqS2Be226fMqasgCUddNpHD9aXNFFq0n7Vl~qrGnxEnp88iXdUmJ2HFFQ4mKgPi6dq35y-eqUvzOixz5b7s~Rm6Hceb~KCmVo~8mjlJZckCCqmtKGAR1PPaPI4SlzZsk~hdFcPjlo_&Key-Pair-Id=APKAJECH5M7VWIS5Y
+Z6Q: net/http: TLS handshake timeout
+```
 
 ## 疑问
 

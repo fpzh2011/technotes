@@ -133,6 +133,10 @@ date --date="tomorrow 6 hour"
 date  --date="next Friday"
 # 获取UTC时间戳
 date +%s
+# 将特定日期转换为UTC时间戳
+date -d "2009-11-15" +%s
+date -d "2009-11-15 00:01" +%s
+date -d "2009-11-15 00:00:01" +%s
 # 获取年月日时分秒
 date_fmt="+%Y-%m-%d %H:%M:%S"
 date "$date_fmt"
@@ -168,10 +172,76 @@ comm
 * 两个文件中有一个可以设定为`-`，即从标准输入读取。
 * `-o`选项可以指定输出格式，格式串是逗号分隔的`FILENUM.FIELD`样式的字符串。FILENUM是文件编号，1或2，。FIELD是字段序号，从1开始。
 
+## awk
+
+`BEGIN { FS = "\x01" }`
+
 ## 数字转换
 
 16进制转10进制：`echo $((16#7b))`
 10进制转16进制：`echo "obase=16; 34" | bc`
+
+## 变量替换、命令替换
+
+```shell
+echo $v
+echo ${v}
+echo ${11}
+echo `date`
+echo $(date)
+```
+
+https://superuser.com/questions/935374/difference-between-and-in-shell-script
+https://stackoverflow.com/questions/9449778/what-is-the-benefit-of-using-instead-of-backticks-in-shell-scripts
+https://stackoverflow.com/questions/457120/whats-the-difference-between-and
+
+## substr
+
+```shell
+echo 1234567890 | cut -c 2-7
+echo 1234567890 | head -c 4
+```
+
+## 日志迁移
+
+nohup scp -C serving-sxs-app-01:/var/data/nginx/log/access.log.old /dev/stdout | bzip2 -ckz --quiet /dev/stdin > access1.bz2 &
+tar czf - /var/data/docker/volumes/syncdata_mysql_data | ssh devops@172.16.1.212 "cd /var/data && tar zxf -"
+
+## 查看进程关系
+
+```shell
+ps afjx
+ps ef | grep defunct
+```
+
+## 压缩
+
+```shell
+# plzip
+tar cf - *.json | plzip -n 8 -k -9 -o sxs.tar
+plzip -d sxs.tar.lz
+```
+
+## web压力测试
+
+```shell
+# apt install apache2-utils
+ab -c 10 -n 1000 -t 3600 \
+	-e c10.csv -k -l -q -r -s 5 \
+	-p body.json \
+	-T "Content-Type:application/json;charset=utf-8" \
+	"http://localhost:8000/interns"
+```
+
+## curl/proxy
+
+```
+export http_proxy="http://39.134.10.4:8080/"
+export https_proxy="14.118.253.118:6666/"
+curl "http://www.sina.com.cn/"
+curl "https://www.baidu.com/"
+curl --socks5-hostname localhost:1080 http://www.baidu.com/
+```
 
 ## 参考资料
 

@@ -1,0 +1,35 @@
+windows下arcanist的安装：
+1）下载安装 php，http://windows.php.net/downloads/releases/php-5.6.32-nts-Win32-VC11-x64.zip，
+   解压到一个指定的目录（如C:\PHP）；
+   将PHP安装目录（如C:\PHP）加入到PATH环境变量中；
+   复制php.ini-development文件为php.ini，并且把“extension_dir= "ext"”、“extension=php_curl.dll”、“extension=php_mbstring.dll”这几行行首的分号去掉；
+   将PHP文件扩展名“.php”加入到PATHEXT环境变量中
+2）安装arcanist，在某个目录下（如c:\或者 d:\）
+   mkdir arc
+   cd arc，在刚创建的目录中下载arcanist
+   git clone https://github.com/phacility/arcanist.git
+   git clone https://github.com/phacility/libphutil.git
+   把arc.bat所在目录（例如C:\phabricator\arcanist\bin）加入到PATH环境变量中。
+   在gitbash 命令行测试arc -help验证一下，如果缺少某些dll需要到搜索引擎搜索下载相关的系统patch
+3）配置arc
+   在C:\Users\zhangjc\AppData\Roaming目录下新建.arcrc文件，内容如下
+   {
+    "hosts": {
+    "https://d.cloudbrain.cc:9443/api/": {
+      "token": "cli-u7cgcmaizeba7ihmba3y5db45oil"
+    }
+    },
+    "config": {
+    "default": "https://d.cloudbrain.cc:9443",
+    "editor": "\"C:\\Program Files (x86)\\Notepad++\\notepad++.exe\" -multiInst -nosession"
+    }
+  }
+  其中token来自：https://d.cloudbrain.cc:9443/conduit/login/，zhangjc为当前系统登录的用户名
+  另外如果没有安装notepad++，建议安装到相关目录
+
+4） 代码提交
+    git clone ssh://git@d.cloudbrain.cc:10022/zhangjc/financeClient.git  （替换为工程网址）
+  git add .
+  git commit -m "test"
+    arc diff，此时会启动notepad++编辑提交内容，编辑(reviewer写上需要review的人)后保存退出
+  通过review后：arc land

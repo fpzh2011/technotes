@@ -319,7 +319,17 @@ http://www.imooc.com/article/1405
 	www.codeceo.com/article/git-tips-years.html
 	http://shanewfx.github.io/blog/2012/04/28/git-command-note/
 
+## merge branch
 
+https://stackoverflow.com/questions/5601931/best-and-safest-way-to-merge-a-git-branch-into-master
+```
+git checkout -b test
+# do something and commit to test
+git checkout master
+git pull origin master
+git merge test
+git push origin master
+```
 
 
 

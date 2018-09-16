@@ -178,13 +178,47 @@ https://vertxchina.github.io/vertx-translation-chinese/start/FAQ.html
 
 [规避回调地狱](https://vertxchina.github.io/vertx-translation-chinese/start/FAQ.html)
 
+## access.log
+
+https://github.com/tokuhirom/vertx-samples/blob/master/src/main/java/com/example/AccessLogServer.java
+```java
+
+//java -Dvertx.logger-delegate-factory-class-name=io.vertx.core.logging.Log4j2LogDelegateFactory -jar target/server-1.0-fat.jar
+package com.example;
+
+import io.vertx.ext.web.handler.LoggerFormat;
+import io.vertx.rxjava.core.Vertx;
+import io.vertx.rxjava.core.http.HttpServer;
+import io.vertx.rxjava.ext.web.Router;
+import io.vertx.rxjava.ext.web.handler.LoggerHandler;
+
+public class AccessLogServer {
+    public static void main(String[] args) {
+        System.setProperty("vertx.logger-delegate-factory-class-name",
+                "io.vertx.core.logging.Log4j2LogDelegateFactory");
+
+        Vertx vertx = Vertx.vertx();
+        HttpServer httpServer = vertx.createHttpServer();
+        Router router = Router.router(vertx);
+        //放在第一个handler
+        router.route().handler(LoggerHandler.create(LoggerFormat.DEFAULT));
+        httpServer.requestHandler(router::accept).listen(8080);
+    }
+}
+```
+
 ## Cluster
 
 https://www.cubrid.org/blog/understanding-vertx-architecture-part-2
 
 ## Vertx-Unit
 
+https://vertx.io/blog/unit-and-integration-tests/
+https://vertx.io/docs/vertx-unit/java/
+https://mp.duan8.com/a/ruzkabo.html
+
 The methods annotated with @BeforeClass and @AfterClass are invoked once before / after all tests of the class. 
+The setUp method is invoked before each test (as instructed by the @Before annotation)
 http://vertx.io/blog/unit-and-integration-tests/
 在CI的启动代码里可以去调用shell script
 https://stackoverflow.com/questions/525212/how-to-run-unix-shell-script-from-java-code
@@ -192,7 +226,12 @@ https://stackoverflow.com/questions/525212/how-to-run-unix-shell-script-from-jav
 http://vertx.io/blog/my-first-vert-x-3-application/
 http://vertx.io/blog/vert-x-application-configuration/
 http://vertx.io/blog/some-rest-with-vert-x/
-http://vertx.io/blog/unit-and-integration-tests/
 https://github.com/vert-x3/vertx-examples/tree/master/unit-examples
+
+## 常见问题
+
+* vertx中，如果`response`已经`end()`，就不要再执行`routingContext.next()`了，否则会抛出异常。
+* 如果`router`设置的`TimeoutHandler`触发超时，vertx服务端会返回http 503状态码。
+
 
 

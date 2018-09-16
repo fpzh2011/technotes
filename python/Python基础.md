@@ -1,5 +1,11 @@
 # Python基础
 
+## python3
+
+```shell
+sudo apt-get install python3-pip
+```
+
 ## 关键字
 
 ### 打印关键字列表
@@ -315,6 +321,32 @@ if not v_idctype in stat_port.keys():
 * 序列，包括字符串、列表、元组等。
 * 映射，如字典。
 
+### 字典
+
+https://docs.python.org/2/library/stdtypes.html#mapping-types-dict
+https://docs.python.org/2/glossary.html#term-hashable
+
+`dict`的key必须是`hashable`。`set`也是这样。
+如果字符串作为key，是按值区分distinct的，而不是按对象引用。如下面的例子，值相同的两个字符串，作为key初始化dict，dict只保留一个key：
+```python
+# python会缓存较短的字符串。所以测试的字符串必须很长。
+a1 = 'a'*600
+a2 = 'a'*600
+a1 is a2
+a1 == a2
+d = {a1:1, a2:2}
+len(d)
+```
+如果自定义类作为key，而没有重载`object.__hash__()`函数，则两个不同对象会是不同的key：
+```python
+class C(object):
+	pass
+c1 = C()
+c2 = C()
+d = {c1: 1, c2:2}
+len(d)
+```
+
 ### 字符串
 
 字符串str是字节序列，unicode是字符序列，unicode可以根据编码方式（如utf-8）转为字符串str。
@@ -338,6 +370,10 @@ j = json.loads(s)
 print j.get('msg').__class__.__name__
 print j.get('msg')
 ```
+
+如果用`print u'中国'`重定向到文件，会报错UnicodeEncodeError。
+如果用`open('1.txt', 'w')`然后write unicode，也会报错。
+用`io.open('1.txt', 'w')`就正常运行。
 
 ### 整数
 
@@ -459,7 +495,7 @@ Python不支持`++`操作符，但支持`a += 1`操作符。
 
 类的静态方法，在`def`语句前一行添加`@staticmethod`修饰符（P691,796）。参考：https://docs.python.org/2/library/functions.html#staticmethod
 
-类的类方法，在`def`语句前一行添加`@classmethod  `修饰符。
+类的类方法，在`def`语句前一行添加`@classmethod`修饰符。
 
 [静态方法与类方法的区别](http://blog.csdn.net/handsomekang/article/details/9615239)：
 * `@classmethod`不需要表示对象自身的`self`参数，但第一个参数需要是表示类自身的`cls`参数。
@@ -523,6 +559,7 @@ P808，1046
 ## import和from
 
 一个py文件就是一个模块。模块是Python最大的程序结构。（学习手册，P63，P68）
+注意：如果要导入a.py中的类a，需要`import a.a`，而不是`import a`。
 
 `import`和`from sys import exit`语句都可以导入一个模块。import一个模块的时候，会导入该模块的全部内容，如果该模块有全局语句，这些语句在导入的最后一步会被执行（学习手册，P65）。
 import会复制imported模块的所有变量到importing模块中来（学习手册，P63，64）。下面第2个例子可以看到，函数也是一种变量。
@@ -622,6 +659,10 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.info(u"abc 中国")
 ```
+
+如果输出到console且未指定stream，默认输出到stderr。
+https://docs.python.org/2/howto/logging.html
+https://docs.python.org/2/library/logging.html#logging.basicConfig
 
 ## 循环
 
@@ -739,6 +780,11 @@ a, b = b, a #swap
 * blas
 * atlas
 
+检查线性代数库是否可用：
+`ldd /usr/local/lib/python2.7/dist-packages/numpy/core/multiarray.so`
+https://stackoverflow.com/questions/37184618/find-out-if-which-blas-library-is-used-by-numpy/37190672
+https://stackoverflow.com/questions/9000164/how-to-check-blas-lapack-linkage-in-numpy-scipy
+
 ## ipython
 
 安装：`sudo pip install ipython`
@@ -781,6 +827,24 @@ TypeError: __call__() takes exactly 2 arguments (1 given)
 其它参考资料：
 http://mindonmind.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/
 
+## limits
+
+### 最小浮点正数
+
+```python
+import numpy as np
+import sys
+np.nextafter(0,1)
+sys.float_info.min * sys.float_info.epsilon
+sys.float_info.min * sys.float_info.epsilon == np.nextafter(0,1)
+1.0/(sys.float_info.min*0.27)
+```
+
+## redis
+
+python-redis可以自动重连（本地测试过）。
+但在docker环境下，redis必须在应用之前启动、可用。否则需要重启应用。原因不明。
+
 ## mysql
 
 Python中最常用的MySQL库是[MySQL-python](https://pypi.python.org/pypi/MySQL-python/)。CentOS7下的安装命令为`sudo yum install MySQL-python`。
@@ -802,7 +866,27 @@ cursor.execute('select name from resume where name is not null limit 1')
 row = cursor.fetchone()
 # 查询参数
 c.execute("SELECT * FROM foo WHERE bar = %s AND baz = %s", (param1, param2))
+# 字典形式
+c.execute("""SELECT * FROM records WHERE id = %(id)s""", {"id": 2})
+# 但两种形式，都不支持None转为null
+
+# fetch size || cursor
+# https://stackoverflow.com/questions/337479/how-to-get-a-row-by-row-mysql-resultset-in-python
+import MySQLdb.cursors
+MySQLdb.connect(user="root", passwd="root", db="sxs", cursorclass = MySQLdb.cursors.SSCursor)
 ```
+
+### mysql connector
+
+https://dev.mysql.com/doc/connector-python/en/
+https://dev.mysql.com/doc/connector-python/en/connector-python-example-connecting.html
+https://dev.mysql.com/doc/connector-python/en/connector-python-connectargs.html
+https://dev.mysql.com/doc/connector-python/en/connector-python-api-mysqlcursorprepared.html
+
+注意事项：
+* 创建连接时，如果不制定pool相关参数，不会使用连接池。
+* 连接池会检查连接是否有效、并尝试一次重连。
+* 如果不是连接池，需要自己检查连接是否有效。
 
 ## 线程
 
@@ -815,6 +899,9 @@ https://pymotw.com/2/threading/
 http://effbot.org/zone/thread-synchronization.htm
 https://docs.python.org/2/library/threading.html
 https://docs.python.org/2/library/thread.html
+utf8mb4
+https://dev.mysql.com/doc/connector-python/en/connector-python-api-cext-character-set-name.html
+https://stackoverflow.com/questions/26532722/how-to-encode-utf8mb4-in-python
 
 ### gil
 
@@ -826,15 +913,63 @@ https://docs.python.org/2/library/thread.html
 * 使用C扩展处理计算瓶颈。
 * 使用Lua计算。
 
+### 线程安全
+
+以下操作是线程安全的：
+```python
+d = {}
+d['a'] = 1
+l = []
+l.sort()
+```
+https://docs.python.org/2/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
+https://blog.louie.lu/2017/05/19/深入-gil-如何寫出快速且-thread-safe-的-python-grok-the-gil-how-to-write-fast-and-thread-safe-python/
+https://opensource.com/article/17/4/grok-gil
+
+[google guide](https://google.github.io/styleguide/pyguide.html#Threading)建议**不要依赖内置类型操作的原子性。**
+
 ### 多线程I/O输出同步问题
 
 简单的可以考虑[logging](https://docs.python.org/2/library/logging.html#thread-safety)
 
 [multiprocessing的日志同步](https://stackoverflow.com/questions/641420/how-should-i-log-while-using-multiprocessing-in-python)
 
+## date
+
+date转utc timestamp
+https://stackoverflow.com/questions/5067218/get-utc-timestamp-in-python-with-datetime
+```python
+import pytz
+import time
+mytz = pytz.timezone('Asia/Shanghai')
+dt = mytz.normalize(mytz.localize(datetime.datetime.now(), is_dst=False))
+int(time.mktime(dt.timetuple()))
+```
+
+## url
+
+https://my.oschina.net/guol/blog/95699
+https://stackoverflow.com/questions/2506379/add-params-to-given-url-in-python
+
+## excel
+
+### xlwt
+
+`xlwt`只支持Excel 2003及之前的版本，不能写入超过65535行、256列的数据。
+
+http://www.python-excel.org/
+https://zhuanlan.zhihu.com/p/23998083
+http://wenqiang-china.github.io/2016/05/13/python-opetating-excel/
+
 ## 第三方包管理
 
 Python中管理第三方包有两种方式，`pip`和`easy_install`。
+
+### Anaconda
+
+https://zh.wikipedia.org/wiki/Anaconda_(Python发行版)
+https://www.jianshu.com/p/16df00d65ecd
+http://devopspy.com/python/conda-vs-pip/
 
 ## ipython
 
@@ -844,6 +979,35 @@ Python中管理第三方包有两种方式，`pip`和`easy_install`。
 
 学习手册，P593
 https://docs.python.org/2/library/__future__.html
+
+## 其它
+
+### setup.py vs requirements.txt
+
+http://pyzh.readthedocs.io/en/latest/python-setup-dot-py-vs-requirements-dot-txt.html
+https://caremad.io/posts/2013/07/setup-vs-requirement/
+https://pip.pypa.io/en/stable/user_guide/#requirements-files
+http://blog.csdn.net/orangleliu/article/details/60958525
+
+### virtualenv
+
+https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432712108300322c61f256c74803b43bfd65c6f8d0d0000
+
+pyenv,pipenv
+
+### and or logic
+
+`and/or`是逻辑操作，可以用于判断`True/False`。
+但是，`and/or`表达式的返回值，并不一定是`True/False`，而是评估的表达式的值。
+```python
+'a' and 'b'
+'' and 'a'
+'' or 'a'
+```
+
+https://docs.python.org/2/reference/expressions.html#boolean-operations
+https://blog.csdn.net/niuniuyuh/article/details/71213887
+http://www.diveintopython.net/power_of_introspection/and_or.html
 
 ## 问题
 

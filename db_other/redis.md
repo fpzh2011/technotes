@@ -166,6 +166,9 @@ github: https://github.com/andymccurdy/redis-py
 
 https://stackoverflow.com/questions/24875806/redis-in-python-how-do-you-close-the-connection
 
+redis客户端实例的大部分操作都是线程安全的，但是PubSub or Pipeline不是线程安全的。另外，连接对象底层使用了连接池。
+https://pypi.python.org/pypi/redis
+
 ## 高可用
 
 几种方案：
