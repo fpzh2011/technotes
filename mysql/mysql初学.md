@@ -190,16 +190,19 @@ https://dev.mysql.com/doc/refman/5.7/en/load-data.html
 ```
 # shell
 # dump schema def & data
+# --tables 会忽略 --databases
 mysqldump -h localhost \
+	--no-create-info \
 	-u root -p \
 	--databases main --default-character-set=utf8mb4 \
-	--tables tb1 tb2 \
+	--result-file=file_name
+	--tables dbname tb1 tb2 \
 	> export.sql
 # only schema def
 mysqldump -h localhost -d \
         -u root -p \
         --databases zjh \
-        --tables question question_kn question_suite \
+        --tables dbname question question_kn question_suite \
         > def.sql
 ```
 
@@ -235,6 +238,8 @@ https://dev.mysql.com/doc/refman/8.0/en/json.html
 ```sql
 SELECT name, tags->"$[0]" AS `tag1` FROM `book`;
 SELECT name, profile->"$.twitter" AS `twitter` FROM `user`;
+-- 字符串不带引号
+select lastAnswer->>"$.qid" from next_question_log limit 10;
 ```
 
 ## virtual column
@@ -285,6 +290,10 @@ https://dev.mysql.com/doc/refman/8.0/en/gone-away.html
 ## history命令历史记录
 
 `more ~/.mysql_history`
+
+## mysql 性能优化教程 caoz
+
+https://wenku.baidu.com/view/aa43ecc3aa00b52acfc7ca94.html
 
 # 疑问
 

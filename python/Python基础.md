@@ -49,7 +49,7 @@ http://www.cnblogs.com/xuxm2007/archive/2010/08/04/1792463.html
 
 ```python
 if __name__ == '__main__':
-	statements
+    statements
 ```
 
 这段代码的主要作用主要是让该python文件既可以独立运行，也可以当做模块导入到其他文件。
@@ -65,9 +65,9 @@ http://www.cnblogs.com/herbert/archive/2011/09/27/2193482.html
 import sys
 
 for line in sys.stdin:
-	#print 1, line
-	sys.stdout.write(line)
-	
+    #print 1, line
+    sys.stdout.write(line)
+    
 #print('....', end='') #Python3
 ```
 
@@ -102,7 +102,7 @@ print j.keys()
 
 ### 从文件解析
 with open('data.json') as data_file:
-	data = json.load(data_file)
+    data = json.load(data_file)
 ```
 
 https://docs.python.org/2/library/json.html
@@ -126,10 +126,10 @@ issubclass(A, object)
 
 ```python
 if j[scan_type].__class__.__name__ != 'dict' :
-	continue
+    continue
 # 判断类型
 if not isinstance(j[scan_type], dict):
-	continue
+    continue
 # 打印完整类型名称
 o = j[scan_type]
 print o.__module__ + "." + o.__class__.__name__
@@ -157,11 +157,11 @@ import optparse
 
 parser = optparse.OptionParser()
 parser.add_option("-q", "--query", 
-	action="store", dest="query", # dest定义了options的一个成员变量
-	help="query string", default="akdfjak")
+    action="store", dest="query", # dest定义了options的一个成员变量
+    help="query string", default="akdfjak")
 parser.add_option("-a", "--add", 
-	action="store", dest="add",
-	help="query string", default="tttt")
+    action="store", dest="add",
+    help="query string", default="tttt")
 options, args = parser.parse_args();
 print "Query string:", options.query
 print options.add
@@ -237,7 +237,19 @@ http://stackoverflow.com/questions/11007627/python-variable-declaration
 学习手册，P307。
 * `_x`不会被`from module import *`导入。
 * `__x__`是系统定义的变量名，对解释器有特殊意义。
-* `__x`是类的本地变量（前面有两个下划线），系统会自动在变量名前添加类名。
+* `__x`是类的本地变量（前面有两个下划线），系统会自动在变量名前添加类名。如果父类定义了`__x`，子类也不能访问。
+
+```python
+class A:
+    def __init__(self):
+        self._a = 9
+class B(A):
+    def __init__(self):
+        A.__init__(self)
+        self.b = self._a
+b = B()
+print(b.b)
+```
 
 http://stackoverflow.com/questions/1301346/what-is-the-meaning-of-a-single-and-a-double-underscore-before-an-object-name
 
@@ -249,9 +261,9 @@ Python中没有block作用域的概念，只有函数、外包、全局、内置
 #!/usr/bin/python
 
 try:
-	a = "abc"
+    a = "abc"
 except:
-	pass
+    pass
 print a
 ```
 
@@ -293,17 +305,17 @@ print str(netaddr.IPAddress(3232236598))
 ```python
 stat_port = {}
 for i in idctype:
-	stat_port[i] = {}
-	stat_port[i]['80'] = 0
+    stat_port[i] = {}
+    stat_port[i]['80'] = 0
 for i in idctype:
-	for j in port:
-		print i, j
-		stat_port[i][j] = 0
+    for j in port:
+        print i, j
+        stat_port[i][j] = 0
 ```
 也可以动态创建：
 ```python
 if not v_idctype in stat_port.keys():
-	stat_port[v_idctype] = {}
+    stat_port[v_idctype] = {}
 ```
 
 因为字典`stat_port['1']`的value可能是任何类型，如果是字典类型，需要通过一个空字典显式告诉编译器。
@@ -340,7 +352,7 @@ len(d)
 如果自定义类作为key，而没有重载`object.__hash__()`函数，则两个不同对象会是不同的key：
 ```python
 class C(object):
-	pass
+    pass
 c1 = C()
 c2 = C()
 d = {c1: 1, c2:2}
@@ -411,14 +423,14 @@ http://stackoverflow.com/questions/3477283/what-is-the-maximum-float-in-python
 ```python
 s = 'abcde'
 print s[2]
-print s[1:3]	# 相当于C++的 begin/end迭代器，3不被包含
-print s[:-1]	# -1相当于 len(s)-1
+print s[1:3]    # 相当于C++的 begin/end迭代器，3不被包含
+print s[:-1]    # -1相当于 len(s)-1
 for c in s:
-	print c
+    print c
 # 合并与重复
 a = [1,2,3]
-b = a * 2		# 重复
-c = a + b		# 合并
+b = a * 2        # 重复
+c = a + b        # 合并
 ```
 
 Python貌似没有数组类型。list就是可以动态扩展的数组。
@@ -434,27 +446,27 @@ Python貌似没有数组类型。list就是可以动态扩展的数组。
 a = [(1, 2, 3)]
 # b是元组
 for b in a:
-	print b
+    print b
 # b,c,d 解开元组
 for b,c,d in a:
-	print b,c,d
+    print b,c,d
 '''
 变量个数要么是1，要么与元组的元素个数相同，否则错误
 for b,c in a:
-	print b,c
+    print b,c
 '''
 
 a = [[1,2,3]]
 # b是列表
 for b in a:
-	print b
+    print b
 # b,c,d 解开列表
 for b,c,d in a:
-	print b,c,d
+    print b,c,d
 '''
 变量个数要么是1，要么与列表的元素个数相同，否则错误
 for b,c in a:
-	print b,c
+    print b,c
 '''
 ```
 
@@ -502,15 +514,16 @@ Python不支持`++`操作符，但支持`a += 1`操作符。
 * `@staticmethod`不需要表示对象自身的`self`参数，也不需要表示类自身的`cls`参数，就跟调用普通函数一样。
 示例如下：
 ```python
-class A(object):
+class B(object):
+    def static_foo(self):
+        print('staitc foo in B')
+
+class A(B):
     bar = 1
     def foo(self):
         print 'foo'
- 
-    @staticmethod
-    def static_foo():
-        print 'static_foo'
-        print A.bar
+        self.static_foo()
+
  
     @classmethod
     def class_foo(cls):
@@ -518,7 +531,8 @@ class A(object):
         print cls.bar
         cls.static_foo()
         cls().foo()
-
+a = A()
+a.foo()
 A.static_foo()
 A.class_foo()
 ```
@@ -535,12 +549,12 @@ Python中有三种方法实现，一种是在方法中使用`assert`语句，第
 from abc import ABCMeta, abstractmethod
 
 class C():
-	# __metaclass__ 的设置是必需的，否则仍可以创建对象
-	__metaclass__ = ABCMeta
+    # __metaclass__ 的设置是必需的，否则仍可以创建对象
+    __metaclass__ = ABCMeta
 
-	@abstractmethod
-	def f(self):
-		pass
+    @abstractmethod
+    def f(self):
+        pass
 ```
 
 ### 新式类
@@ -548,9 +562,38 @@ class C():
 继承自`object`的类是新式类（P779）。
 CentOS7_64, Python2.7.5下，不必显示声明，类自动继承object。
 
+## python exception stack trace问题
+
+```python
+# test_B.py
+class Base(object):
+    def f1(self):
+        print('Base f1')
+
+    def f(self):
+        self.f1()
+        print('Base f')
+
+# test_D.py
+class D(Base):
+    def f1(self, a):
+    #def f1(self):
+        print('D f1')
+
+# test_main.py
+if __name__ == '__main__':
+    d = D()
+    d.f()
+
+# python test_main.py
+```
+
 ## 装饰器decorator
 
 类似Java的注解。P805, 979。
+
+python学习手册
+* ch31, ch37, ch38
 
 ## 元类
 
@@ -670,7 +713,7 @@ Python中的for只能处理序列（学习手册，P343）。当Python运行for�
 Python中没有类似C/C++中的for循环，如：
 ```c
 for(int i = 0; i < N; ++i) {
-	//do something ...
+    //do something ...
 }
 ```
 Python实现类似功能，可以用range函数。
@@ -692,6 +735,14 @@ for循环可用于任何可迭代的对象（学习手册P361）。可迭代对�
 * 列表解析
 * in成员关系测试
 * map、zip、sorted、enumerate、filter、reduce、sum、any、all、max、min等内置函数
+
+## sort 排序
+
+https://www.cnblogs.com/ajianbeyourself/p/5395653.html
+
+稳定排序
+https://docs.python.org/2/howto/sorting.html#sort-stability-and-complex-sorts
+https://docs.python.org/2/library/stdtypes.html#iterator-types
 
 ## 程序结构
 
@@ -729,15 +780,15 @@ Python没有语句块作用域。在try、if等语句块中定义的变量，作
 #!/usr/bin/python
 
 def gensquares(N):
-	print "in gen"
-	for i in range(N):
-		print "before yield, in for"
-		yield i ** 2
-		print "in for, after yield", i, N
-	print "outer for", i, N
+    print "in gen"
+    for i in range(N):
+        print "before yield, in for"
+        yield i ** 2
+        print "in for, after yield", i, N
+    print "outer for", i, N
 
 for i in gensquares(5):
-	print i
+    print i
 
 x = gensquares(10)
 print next(x)
@@ -787,7 +838,7 @@ https://stackoverflow.com/questions/9000164/how-to-check-blas-lapack-linkage-in-
 
 ## ipython
 
-安装：`sudo pip install ipython`
+安装：`sudo pip install ipython && sudo apt-get install ipython3`
 
 运行`ipython`，CentOS7报错：
 ```
@@ -826,6 +877,30 @@ TypeError: __call__() takes exactly 2 arguments (1 given)
 
 其它参考资料：
 http://mindonmind.github.io/2013/02/08/ipython-notebook-interactive-computing-new-era/
+
+## jupyter
+
+web版ipython
+
+### 配置初始化
+
+`jupyter notebook --generate-config`
+初始化文件`~/.jupyter/jupyter_notebook_config.py`
+https://jupyter-notebook.readthedocs.io/en/stable/public_server.html
+
+### 设置口令
+
+`jupyter notebook password`
+
+### jupyter支持多用户的方案：
+
+* 各个用户分配不同目录，口头约定
+* 不同用户配置不同的端口、目录 https://blog.csdn.net/JJwho/article/details/75102045
+* https://github.com/jupyterhub/jupyterhub
+
+### jupyterhub
+
+https://mohanamuraligurunathan.blogspot.com/2018/04/jupyterhub-offline-install-without.html
 
 ## limits
 
@@ -946,6 +1021,19 @@ dt = mytz.normalize(mytz.localize(datetime.datetime.now(), is_dst=False))
 int(time.mktime(dt.timetuple()))
 ```
 
+## 调用 shell bash script
+
+https://docs.python.org/3.5/library/subprocess.html
+https://stackoverflow.com/questions/13745648/running-bash-script-from-within-python
+https://stackoverflow.com/questions/26236126/how-to-run-bash-commands-inside-of-a-python-script
+https://stackoverflow.com/questions/20415522/running-a-bash-script-from-python
+https://stackoverflow.com/questions/3777301/how-to-call-a-shell-script-from-python-code
+
+## 异步io
+
+异步web/net框架
+https://github.com/tornadoweb/tornado
+
 ## url
 
 https://my.oschina.net/guol/blog/95699
@@ -965,11 +1053,30 @@ http://wenqiang-china.github.io/2016/05/13/python-opetating-excel/
 
 Python中管理第三方包有两种方式，`pip`和`easy_install`。
 
+### pip
+
+* upgrade: `sudo pip install --upgrade numpy`
+* PIP_INDEX_URL=https://mirrors.aliyun.com/pypi/simple
+
 ### Anaconda
 
 https://zh.wikipedia.org/wiki/Anaconda_(Python发行版)
 https://www.jianshu.com/p/16df00d65ecd
 http://devopspy.com/python/conda-vs-pip/
+https://conda.io/docs/user-guide/concepts.html
+术语 https://conda.io/docs/glossary.html
+
+清华大学镜像：
+```shell
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --set show_channel_urls yes
+```
+
+R:
+```shell
+conda install -c r r-essentials
+```
+https://zhuanlan.zhihu.com/p/25430471
 
 ## ipython
 
@@ -994,6 +1101,21 @@ http://blog.csdn.net/orangleliu/article/details/60958525
 https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432712108300322c61f256c74803b43bfd65c6f8d0d0000
 
 pyenv,pipenv
+
+```
+virtualenv --no-site-packages project_name
+source venv/bin/activate
+deactivate
+```
+
+### UML
+
+```
+brew install graphviz # suport svg etc.
+pip install pylint
+cd phoenix
+pyreverse -A -k -S -o svg strategies
+```
 
 ### and or logic
 

@@ -178,6 +178,12 @@ docker export -o container.tar containerId
 https://stackoverflow.com/questions/22655867/what-is-the-difference-between-save-and-export-in-docker
 https://my.oschina.net/zjzhai/blog/225112
 
+## docker-compose & swarm
+
+### 多个compose文件组合
+
+https://docs.docker.com/compose/extends/
+
 ## 网络
 
 swarm的compose文件中：
@@ -216,6 +222,11 @@ error pulling image configuration: Get https://dseasb33srnrn.cloudfront.net/regi
 Signature=FiF5jr~2Vy-FGLPUeRvkRv6~K66cRPqBfNsqS2Be226fMqasgCUddNpHD9aXNFFq0n7Vl~qrGnxEnp88iXdUmJ2HFFQ4mKgPi6dq35y-eqUvzOixz5b7s~Rm6Hceb~KCmVo~8mjlJZckCCqmtKGAR1PPaPI4SlzZsk~hdFcPjlo_&Key-Pair-Id=APKAJECH5M7VWIS5Y
 Z6Q: net/http: TLS handshake timeout
 ```
+
+## 编排与管理
+
+https://rancher.com/docs/rancher/latest/zh/
+https://github.com/portainer/portainer
 
 ## 疑问
 

@@ -4,6 +4,13 @@
 
 https://github.com/VundleVim/Vundle.vim
 
+```
+:BundleInstall tclh123/vim-thrift
+
+# .vimrc
+Plugin 'solarnz/thrift.vim'
+```
+
 ### 安装方法
 
 `git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim`

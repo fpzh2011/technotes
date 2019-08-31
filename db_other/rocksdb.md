@@ -20,8 +20,8 @@ sudo make install
 
 ## 安装
 
-如果需要部署到生产环境，运行`make static_lib`，生成的 librocksdb.a 有225M。程序仅有put代码，静态链接后50M。
-运行`make shared_lib`生成共享库，完成后运行`ldd librocksdb.so`检查动态链接库是否正常。必要时设置`export LD_LIBRARY_PATH=/usr/local/lib`。
+如果需要部署到生产环境，运行`make static_lib`，生成的release librocksdb.a 有225M。程序仅有put代码，静态链接后50M。
+运行`make shared_lib`生成release共享库，完成后运行`ldd librocksdb.so`检查动态链接库是否正常。必要时设置`export LD_LIBRARY_PATH=/usr/local/lib`。
 
 https://github.com/facebook/rocksdb/blob/master/INSTALL.md
 
@@ -103,5 +103,20 @@ java/target/apidocs/ （编译之后）
 查询管理工具：ldb
 https://github.com/facebook/rocksdb/wiki/Administration-and-Data-Access-Tool
 `make ldb`
+
+## pytohn-rocksdb
+
+pytohn-rocksdb依赖librocksdb-dev，但是apt的版本太低，与python-rocksdb不匹配。需要根据源码编译安装最新版rocksdb。
+```
+sudo apt-get install libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev liblz4-dev libzstd-dev
+git clone https://github.com/facebook/rocksdb.git
+make shared_lib
+sudo make install
+sudo pip install python-rocksdb
+```
+
+[pyrocksdb](https://github.com/stephan-hof/pyrocksdb.git)已经很久不维护了。
+
+
 
 

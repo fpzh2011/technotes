@@ -35,7 +35,7 @@ https://redis.io/commands/set
 
 **批量数据导入**
 
-`cat data.txt | redis-cli --pipe`
+`cat data.txt | redis-cli --pipe --pipe-timeout 0`
 https://redis.io/topics/mass-insert
 
 data.txt的样例：
@@ -175,6 +175,18 @@ https://pypi.python.org/pypi/redis
 * Sentinel。至少3台机器。只支持在master故障时将某个slave切换为master，不支持slave的高可用，适合较小规模。（Redis开发与运维，P271）
 * codis。可以水平扩展，客户端类似单机redis，需要zookeeper。主从切换需要人工介入。
 * redis cluster。比较重。具体参考下面的资料。
+
+## 普通用户安装 install without root
+
+```
+curl -O http://download.redis.io/redis-stable.tar.gz
+tar -xzf redis-stable.tar.gz
+cd redis-stable
+make
+make test # optional
+src/redis-server
+src/redis-cli
+```
 
 参考资料：
 http://www.infoq.com/cn/articles/effective-ops-part-03

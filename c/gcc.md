@@ -2,17 +2,24 @@
 
 ## 命令行选项
 
-	-c 只编译或汇编，不链接。为每个源文件生成object文件。将源文件的.c或.s替换为.o作为输出文件名。
-	-S 生成汇编代码
-	-o 指定输出文件名（包括编译、链接等）。
-	-masm=intel 生成intel指令的汇编代码（默认是AT&T指令）
-	-m32 -m64 32/64位指令
-	-I 指定头文件的搜索目录。这里指定的头文件优先于标准系统include目录。
-	-E 只进行预处理，处理 #include、#define 等预处理指令，不编译。
-	-L 指定链接库目录
-	-static 静态链接。需要安装静态库。rhel7的dvd中好像没有静态库，可以用centos的glibc-static-2.17-78.el7.x86_64.rpm
+* `-c` 只编译或汇编，不链接。为每个源文件生成object文件。将源文件的.c或.s替换为.o作为输出文件名。
+* `-S` 生成汇编代码
+* `-o` 指定输出文件名（包括编译、链接等）。
+* `-masm=intel` 生成intel指令的汇编代码（默认是AT&T指令）
+* `-m32 -m64` 32/64位指令
+* `-I` 指定头文件的搜索目录。这里指定的头文件优先于标准系统include目录。
+* `-E` 只进行预处理，处理 #include、#define 等预处理指令，不编译。
+* `-L` 指定链接库目录
+* `-llibrary`或`-l library` 指定需要的链接库，如`-liconv`。用gcc链接静态库的时候，`-l`要放在xxx.c后面。
+* `-static` 静态链接。需要安装静态库。rhel7的dvd中好像没有静态库，可以用centos的glibc-static-2.17-78.el7.x86_64.rpm
+* `-shared` 编译源代码为动态链接库，如gcc -fPIC -shared test.c -o libtest.so
+* `-fPIC` 用于编译阶段，告诉编译器产生与位置无关代码(Position-Independent Code),则产生的代码中，没有绝对地址，全部使用相对地址，故而代码可以被加载器加载到内存的任何位置，都可以正确的执行。这正是共享库所要求的，共享库被加载时，在内存的位置不是固定的。
+* `-v` 输出verbose详细信息
 
 对编译或链接后的文件，反汇编可以用`objdump -d a.out`
+
+参考：
+* `man gcc`
 
 ## C标准支持
 
@@ -82,11 +89,54 @@ objdump -d 或 objdump -D （反汇编全部内容）
 
 验证下载文件：`gpg --verify --keyring ./gnu-keyring.gpg gcc-4.9.4.tar.bz2.sig`
 
+## 静态库
 
+静态库用`ar`命令创建。
+http://tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html
 
+## ld链接
 
+### ld
 
+编译后的链接工具。
 
+### LD_LIBRARY_PATH
+
+* 指示给dynamic loader的动态链接库目录列表
+* 程序加载执行时(`ld.so`)，系统会把`LD_LIBRARY_PATH`添加到默认动态链接库目录列表前面
+* `ld`链接时，也会搜索`LD_LIBRARY_PATH`目录列表，放在`-L`指定目录的后面
+`man 8 ld.so`
+http://xahlee.info/UnixResource_dir/_/ldpath.html
+http://osr507doc.sco.com/en/tools/ccs_linkedit_dynamic_dirsearch.html
+
+### LD_RUN_PATH
+
+链接截断linker用的动态链接库目录列表，搜索次序在系统默认路径之前。
+http://osr507doc.sco.com/en/tools/ccs_linkedit_dynamic_dirsearch.html
+
+### LD_PRELOAD
+
+预先加载的共享库目录列表，搜索顺序在用户定义、系统默认等库搜索路径之前，可以覆盖其它库的函数。
+`man 8 ld.so`
+
+### rpath
+
+elf或so文件中记录的动态链接库库搜索路径，链接时确定。
+https://en.wikipedia.org/wiki/Rpath
+
+### 目录优先级
+
+https://stackoverflow.com/questions/7967848/use-rpath-but-not-runpath
+
+### 库详细解读
+
+Shared Libraries是在程序启动时加载的(?)；动态链接库不一定在程序启动时加载，而是在执行到库代码时加载。
+http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
+
+## configure
+
+`./configure --help`
+https://www.cnblogs.com/taskiller/archive/2012/12/14/2817650.html
 
 ##参考资料
 

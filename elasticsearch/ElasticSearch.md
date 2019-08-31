@@ -164,7 +164,7 @@ curl -s -G "localhost:9200/sxs/_search?pretty&analyzer=user_ansj" --data-urlenco
 curl -s -G "localhost:9200/sxs/_search?pretty&analyzer=search_ansj" --data-urlencode "q=计算机科学与技术软件工程" -o - > 7.txt
 
 # 查看分词结果
-curl -XPOST 'localhost:9201/intern/_analyze?pretty' -d'
+curl -XPOST 'localhost:9201/intern/_analyze?pretty' -H "Content-Type: application/json" -d'
 {
   "analyzer": "ik_max_word",
   "text": "硕士abc DEF 产品经理"
@@ -259,6 +259,17 @@ curl -XGET 'http://localhost:9200/_cluster/state?pretty'
 ```
 
 ## 优化
+
+### ES的内存设置优化
+
+* 确保Xms与Xmx是相同的，防止程序在运行时改变堆内存大小， 这是一个很耗系统资源的过程。
+* 把50%的可用内存作为Elasticsearch的堆内存。把内存的（少于）另一半给 Lucene。
+* 堆内存不要超过32G，以免java内存指针压缩失效(compressed oops)。
+* 堆内存不要高于26/30G，以免zero-based compressed oops失效。
+https://www.elastic.co/guide/cn/elasticsearch/guide/current/heap-sizing.html
+https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
+
+### 通用优化
 
 优化经典文章
 https://www.elastic.co/blog/found-optimizing-elasticsearch-searches

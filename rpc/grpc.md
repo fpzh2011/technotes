@@ -25,8 +25,12 @@ sudo pip install grpcio grpcio-tools
 https://github.com/grpc/grpc/tree/master/src/python/grpcio
 https://github.com/grpc/grpc/issues/5738
 https://grpc.io/docs/quickstart/python.html
+https://halfrost.com/protobuf_encode/
 
 ### proto example
+
+在 proto 中，所有结构化的数据都被称为 message。
+servive只能最多有一个输入、一个输出。
 
 ```proto
 syntax = "proto3";
@@ -60,14 +64,33 @@ python -m grpc_tools.protoc -I../java/src/main/proto --python_out=. --grpc_pytho
 ```
 例子中的`GreeterGrpc`不是protoc生成，而是[maven/gradle](https://github.com/caio/grpc-java-gradle-hello-world/issues/1)插件生成的。
 
+### python server and client
+
+https://grpc.io/docs/tutorials/basic/python/
+
 ## keepalive
 
 https://github.com/grpc/grpc/blob/master/doc/keepalive.md
+
+HTTP 1.0 需要使用 keep-alive 参数来告知服务器端要建立一个长连接，而 HTTP1.1 默认支持长连接。
+http://jartto.wang/2018/03/30/grasp-http2-0/
+
+## stress test压力测试
+
+https://ghz.sh/
+https://github.com/bojand/ghz
 
 ## load balance
 
 https://grpc.io/blog/loadbalancing
 https://github.com/grpc/grpc/blob/master/doc/load-balancing.md
+几种选择：
+* 负载均衡server，如SLB，需要配置ip
+* client自己做负载均衡，无法感知服务器的负载
+* nginx/envoy。灵活。
+* docker dns。量少时负载不均衡。
+
+k8s就不需要proxy吗？为什么？
 
 ### grpc-lb
 
