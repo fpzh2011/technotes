@@ -48,7 +48,7 @@ var b, f, s = true, 2.3, "four" // bool, float64, string
 
 ### 指针
 
-Go语言提供了指针。&操作符可以返回一个变量的内存地址，并且*操作符可以获取指针指向的变量内容，但是在Go语言里没有指针运算，也就是不能像c语言里可以对指针进行加或减操作（[3],CH1.8）。
+Go语言提供了指针。&操作符可以返回一个变量的内存地址，并且`*`操作符可以获取指针指向的变量内容，但是在Go语言里没有指针运算，也就是不能像c语言里可以对指针进行加或减操作（[3],CH1.8）。
 
 即使变量由表达式临时生成，那么表达式也必须能接受&取地址操作。（[3]，CH2.3.2）
 
@@ -56,12 +56,38 @@ Go语言提供了指针。&操作符可以返回一个变量的内存地址，�
 
 rp util.Hash 如果对传入的string进行修改，会影响原来的string对象吗？？？？？？？？？？？？（[1]，P108）
 
+## 协程 goroutine
+
+协程之间没有父子关系，一个协程只是与其它协程一起并行执行。唯一的例外是，main协程退出后，程序终止。
+https://www.reddit.com/r/golang/comments/4kpv6x/why_a_parent_goroutine_doesnt_kill_its_child_and/
+
 ## slice
 
 slice包含自身(go语言程序设计 P66)
 
+### string与[]byte
 
-## 值还是引用？
+string与[]byte转换会拷贝数据。go官方不建议不安全的拷贝，因为很多包依赖于string是不可变的，比如map。
+strings.Builder使用了这种方式。
+一种不安全的方式：
+```go
+// https://github.com/golang/go/issues/25484
+// https://golang.org/src/strings/builder.go#L45
+func ByteSlice2String(bs []byte) string {
+	return *(*string)(unsafe.Pointer(&bs))
+}
+
+func UnsafeStringToBytes(str string) []byte {
+	return *(*[]byte)(unsafe.Pointer(&str))
+}
+```
+
+## debug数据结构
+
+github.com/davecgh/go-spew/
+https://blog.thinkeridea.com/201902/go/string_ye_shi_yin_yong_lei_xing.html
+
+## 值还是引用
 
 ### 值保存方式
 
@@ -72,14 +98,7 @@ slice包含自身(go语言程序设计 P66)
 ### 引用保存方式
 
 map、slice切片、接口等都是引用保存方式。（[1]，P108，P113；[2] P66）
-
-
-问题？？？？？？？？？？？？？？？？？？？？
-查询一个map，返回的value也是引用方式吗？？？？？（rule.go中的CreateBranch函数，是因为value是指针类型。如果是struct呢，如果是int呢）
-比如可以直接操作：`mymap["abc"] = 123`，这个是另一种情况？
-
-
-
+无法获取map的value的地址。
 
 ### 垃圾回收
 
@@ -188,6 +207,10 @@ rand.Seed(time.Now().UnixNano())  // or time.Nanoseconds()
 ```
 https://flaviocopes.com/go-random/
 https://stackoverflow.com/questions/12321133/
+
+### time
+
+https://studygolang.com/topics/2192
 
 ## 代码格式
 
@@ -470,7 +493,9 @@ https://golang.org/doc/faq#nil_error
 
 ## 错误处理 error
 
+https://www.flysnow.org/2019/09/06/go1.13-error-wrapping.html
 https://github.com/pkg/errors
+https://godoc.org/github.com/pkg/errors
 
 ## go设计模式 pattern
 
@@ -488,7 +513,7 @@ WaitGroup/context
 https://www.flysnow.org/2017/05/12/go-in-action-go-context.html
 
 并发模型-pipeline
-https://zhuanlan.zhihu.com/p/59295820?utm_source=wechat_session&utm_medium=social&s_r=0
+https://zhuanlan.zhihu.com/p/59295820
 
 map不是协程安全的
 https://www.jianshu.com/p/f2e7650da938
@@ -501,6 +526,10 @@ https://zhuanlan.zhihu.com/p/34417106
 https://draveness.me/golang-context
 https://zhuanlan.zhihu.com/p/60180409?utm_source=wechat_session&utm_medium=social&s_r=0
 
+晓辉
+https://github.com/grpc/grpc-go/blob/master/metadata/metadata.go
+https://github.com/grpc/grpc-go/blob/master/clientconn.go#L213
+
 ## sync
 
 ### atomic
@@ -509,13 +538,49 @@ https://blog.betacat.io/post/golang-atomic-value-exploration/
 https://skyao.io/learning-go/stdlib/sync/atomic.html
 https://golang.org/pkg/sync/atomic/#Value
 
+Value一经使用就不能拷贝(可传递指针)。拷贝+Load也不行(无法反映Store数据更新)。
+https://studygolang.com/articles/17972
+
+闭包是引用传递环境变量
+```go
+package main
+
+import (
+    "fmt"
+	"time"
+	"sync/atomic"
+)
+
+func main() {
+    var i int = 0
+	var value atomic.Value
+	value.Store(i)
+	fmt.Println(value.Load())
+	go func() {
+		value.Store(1)
+	}()
+	time.Sleep(5000)
+	fmt.Println(value.Load())
+}
+```
+
 ### map
 
 目前只适用个别场景
 https://colobu.com/2017/07/11/dive-into-sync-Map/
 
-## defer/recover
+## defer/panic/recover
 
+panic如果没有被recover，错误信息会输出到stderr。
+对于grpc等server，通常每个请求一个goroutine。handler panic后，server不会崩溃。应该是server在创建goroutine是增加了defer/recover处理。thor会把panic错误存储到日志文件。
+但是，如果handler自己创建了goroutine并在其中panic而没有recover，整个server会崩溃。这个错误信息如果没有特殊处理，不会保存到日志文件。
+
+java中的线程也没有父子关系。
+https://stackoverflow.com/questions/19988092/does-a-child-thread-in-java-prevent-the-parent-threads-to-terminate
+
+Recover is only useful inside deferred functions.
+https://blog.golang.org/defer-panic-and-recover
+https://golang.org/ref/spec#Handling_panics
 https://ieevee.com/tech/2017/11/23/go-panic.html
 https://sanyuesha.com/2017/07/23/go-defer/
 https://deepzz.com/post/how-to-use-defer-in-golang.html
@@ -574,6 +639,10 @@ set GOOS=windows
 https://golang.org/doc/install/source#environment
 https://www.cnblogs.com/oxspirt/p/7072818.htmlGOOS=windows
 
+### go build 汇编
+
+https://mp.weixin.qq.com/s/mlkpqz5TRCiGrRs35WUNRQ
+
 ## 命令行参数
 
 os.Args变量是一个字符串（string）的切片（[3], CH1.2, P4）。
@@ -610,6 +679,24 @@ Vim with vim-go plugin
 ## 隐晦操作符
 
 https://www.gitdig.com/go-operators/
+
+## 反射reflect
+
+https://draveness.me/golang/basic/golang-reflect.html
+
+## go test
+
+运行当前目录和所有子目录的测试用例：`go test ./...`
+https://stackoverflow.com/questions/16353016/how-to-go-test-all-testings-in-my-project
+
+assert
+https://github.com/benbjohnson/testing
+
+Go语言测试进阶版建议与技巧
+https://pengrl.com/p/32101/
+Go编译时会忽略testdata目录。
+
+go test会运行package的init函数。
 
 ## 最佳实践
 
@@ -683,6 +770,9 @@ https://mp.weixin.qq.com/s/3gGbJaeuvx4klqcv34hmmw
 
 ### GC
 
+gc日志格式
+https://segmentfault.com/a/1190000020255157
+
 https://www.ardanlabs.com/blog/2019/05/garbage-collection-in-go-part2-gctraces.html?from=singlemessage
 https://mp.weixin.qq.com/s/eDd212DhjIRGpytBkgfzAg
 
@@ -701,19 +791,33 @@ https://gocn.vip/article/1541
 https://www.zhihu.com/question/48507569
 https://www.jianshu.com/p/42e89de33065
 
-go是否支持异步io？如果一个go routine阻塞，会占用一个线程？
 goroutine stack size
 每个goroutine占用内存大小，由哪些成分构成？
+
+goroutine pool
+https://github.com/panjf2000/ants
+https://github.com/Jeffail/tunny
+https://github.com/ivpusic/grpool
+https://github.com/valyala/fasthttp/blob/master/workerpool.go
 
 ### main函数终结
 
 P171 main函数返回后，所有goroutine都暴力终结。redis/mysql等连接会正常close吗？从服务端看呢？os会发terminate包？
+
+### debug
+
+https://github.com/go-delve/delve
+https://www.cnblogs.com/li-peng/p/8522592.html
 
 ### pprof
 
 我是如何在大型代码库上使用 pprof 调查 Go 中的内存泄漏
 https://juejin.im/post/5ce11d1ee51d4510601117fd
 https://mp.weixin.qq.com/s/B8lJI_2BfMcz-Rd1bNjkyg
+https://blog.golang.org/profiling-go-programs
+
+对比两个时间点的heap，发现内存泄漏
+https://colobu.com/2019/08/20/use-pprof-to-compare-go-memory-usage/
 
 ### trace
 

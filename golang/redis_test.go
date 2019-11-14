@@ -88,6 +88,7 @@ func testString(client *redis.Client) {
 }
 
 func testMGet(client *redis.Client) {
+	// 如果key不存在，对应位置的值是nil
 	result, err := client.MGet("zjh", "uh").Result()
 	if err == redis.Nil { // 不会进入这里
 		fmt.Println("string key not exist")
@@ -99,6 +100,12 @@ func testMGet(client *redis.Client) {
 	}
 	fmt.Printf("multiple string: %v\n", result)
 }
+
+
+// go ttl:
+// * key不存在，-2 * time.Second
+// * key存在，但没有设置超时，-1 * time.Second
+// * ttl * time.Second
 
 func getRedisClient() *redis.Client {
 	return redis.NewClient(&redis.Options{Addr: "localhost:6379"})

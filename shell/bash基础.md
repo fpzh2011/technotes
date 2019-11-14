@@ -21,6 +21,7 @@ https://my.oschina.net/leejun2005/blog/202376
 
 ### loginfo
 
+bash (>=4.2): 
 `printf "%(%Y-%m-%d %H:%M:%S)T %s\n" -1 "log message"`
 
 ## while/for stdin
@@ -405,6 +406,18 @@ https://unix.stackexchange.com/questions/147560/explain-this-bash-script-echo-1
 https://zhidao.baidu.com/question/268947343.html
 
 ## grep
+
+### 搜索前后n行
+
+```shell
+grep -5 pattern log.txt
+grep -C 5 pattern log.txt
+grep -A 5 -B 5 pattern log.txt
+```
+
+### perl模式
+
+比如查找 tab 字符: `grep -P '\t' test.txt`
 
 ### 搜索0/null字符
 
