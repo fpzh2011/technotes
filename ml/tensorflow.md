@@ -1,5 +1,14 @@
 # tensorflow
 
+使用TensorFlow, 你必须明白TensorFlow:
+* 使用图(graph)来表示计算任务.
+* 在被称之为会话(Session)的上下文(context)中执行图.
+* 使用tensor表示数据.
+* 通过变量(Variable)维护状态.
+* 使用feed和fetch可以为任意的操作(arbitrary operation)赋值或者从其中获取数据.
+* 图中的节点被称之为op(operation的缩写).一个op获得0个或多个Tensor, 执行计算, 产生0个或多个Tensor.
+* 会话将图的op分发到诸如CPU或GPU之类的设备上, 同时提供执行op的方法. 这些方法执行后, 将产生的tensor返回.
+
 ## tensor
 
 https://www.tensorflow.org/guide/tensors
@@ -40,6 +49,9 @@ https://www.tensorflow.org/api_docs/python/tf/get_variable
 
 ## session
 
+概述资料
+https://zhuanlan.zhihu.com/p/32869210
+
 During a call to tf.Session.run any tf.Tensor only has a single value.
 
 TensorFlow uses the tf.Session class to represent a connection between the client program and the C++ runtime.
@@ -67,6 +79,13 @@ https://www.tensorflow.org/guide/low_level_intro
 https://www.tensorflow.org/guide/graph_viz
 https://www.tensorflow.org/guide/graphs#visualizing_your_graph
 https://www.tensorflow.org/guide/summaries_and_tensorboard
+
+## device
+
+设备用字符串进行标识. 目前支持的设备包括:
+* "/cpu:0": 机器的 CPU.
+* "/gpu:0": 机器的第一个 GPU, 如果有的话.
+* "/gpu:1": 机器的第二个 GPU, 以此类推.
 
 ## Distributed TensorFlow
 

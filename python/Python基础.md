@@ -1103,6 +1103,11 @@ https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c
 pyenv,pipenv
 
 ```
+pip install --upgrade virtualenv
+python3 -m pip install --user --upgrade virtualenv
+
+virtualenv -p python3 --no-site-packages envname
+python3 -m virtualenv -p `which python3` env
 virtualenv --no-site-packages project_name
 source venv/bin/activate
 deactivate

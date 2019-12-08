@@ -179,6 +179,9 @@ func Signum(x int) int {
 ```
 switch也可以紧跟一个简短的变量声明，一个自增表达式、赋值语句，或者一个函数调用。
 
+## 堆栈分析stack
+
+https://mp.weixin.qq.com/s/SGbiWLW6pLfd32TKIil10A
 
 ## 常用包
 
@@ -207,6 +210,10 @@ rand.Seed(time.Now().UnixNano())  // or time.Nanoseconds()
 ```
 https://flaviocopes.com/go-random/
 https://stackoverflow.com/questions/12321133/
+
+shuffle
+https://golang.org/pkg/math/rand/#Shuffle
+https://studygolang.com/articles/14058
 
 ### time
 
@@ -477,6 +484,11 @@ https://juejin.im/post/5c8e503a6fb9a070d878184a
 go 1.13
 https://mp.weixin.qq.com/s/SGGV3tWEg5AAJ7I_FcK0cg
 
+```
+# go >=1.13 需要配置
+GOPRIVATE="code.rightpaddle.cn"
+```
+
 ## interface 接口
 
 https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/02.6.md
@@ -708,6 +720,8 @@ https://talks.golang.org/2013/bestpractices.slide#1
 https://colobu.com/2017/06/30/idiomatic-go-references/
 Golang 新手可能会踩的 50 个坑
 https://segmentfault.com/a/1190000013739000
+Go语言常见坑
+https://chai2010.cn/advanced-go-programming-book/appendix/appendix-a-trap.html
 
 https://github.com/hoanhan101/ultimate-go
 
@@ -736,6 +750,10 @@ go tool vet -shadow main.go
 go-nyet main.go
 ```
 https://segmentfault.com/a/1190000013739000
+
+## cgo
+
+https://chai2010.cn/advanced-go-programming-book/ch2-cgo/ch2-02-basic.html
 
 ### Go 开发者路线图
 
@@ -822,6 +840,10 @@ https://colobu.com/2019/08/20/use-pprof-to-compare-go-memory-usage/
 ### trace
 
 https://juejin.im/post/5d27400151882530af139a85
+
+### 限流器limitRate rateLimit
+
+https://www.cyhone.com/articles/analysis-of-uber-go-ratelimit/
 
 ### immutability
 
