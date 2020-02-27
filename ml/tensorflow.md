@@ -134,3 +134,7 @@ session与graph的关系，是一对一，还是一对多、多对多？一个se
 https://wizardforcel.gitbooks.io/hands-on-ml-with-sklearn-and-tf/content/docs/10.人工神经网络介绍.html
 用 TensorFlow 高级 API 训练 MLP
 
+源码分析：
+https://www.zhihu.com/question/41667903
+https://blog.csdn.net/jxy0123456789/article/details/81084818
+https://github.com/yao62995/tensorflow

@@ -44,6 +44,14 @@
 
 参考资料[1]。
 
+gcc/g++的默认搜索路径:
+```shell
+`gcc -print-prog-name=cc1plus` -v
+`gcc -print-prog-name=cc1` -v
+```
+https://askubuntu.com/questions/573417/where-are-header-files-for-gcc-located
+https://gcc.gnu.org/onlinedocs/cpp/Search-Path.html
+
 ### 命令行指定参数
 
 `gcc -I /home/my/include test.c`
@@ -91,8 +99,45 @@ objdump -d 或 objdump -D （反汇编全部内容）
 
 ## 静态库
 
-静态库用`ar`命令创建。
+静态库用`ar`命令创建。如`ar -cr libhead.a add.o sub.o`
 http://tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html
+选项:
+* -c: create
+* -r: replace，如果库文件已经存在就替换
+* -t: 查看库文件里包含哪些目标文件
+
+链接时会查找静态库中的每个目标文件，只把需要的抽出来；但是一个静态库只抽取一次，所以库文件选项最好放到后面。
+https://blog.csdn.net/luotuo44/article/details/16970841
+上面这份资料，对编译链接、动态库、静态库等，有很多介绍。
+
+## 动态库
+
+如果代码要编译为动态库，需要指定编译选项`-fPIC`。注意，如果是含有main函数的业务代码、只是引用动态库，不要指定这个编译选项。
+如下命令生成动态库: `g++ -shared -fPIC add.o sub.o -o libhead.so`
+
+Linux查找动态库的地方依次是(man 1 ld; macos是Search paths):
+* 环境变量LD_LIBRARY_PATH/LD_PRELOAD指定的路径
+* 缓存文件/etc/ld.so.cache指定的路径
+* 默认的共享库目录，先是/lib，然后是/usr/lib
+centos:
+* 安装man: sudo yum install man-pages
+* man 8 ld.so
+* rpm -qf /usr/share/man/man8/ld.so.8.gz
+
+http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
+http://man7.org/linux/man-pages/man8/ld.so.8.html
+Linux binaries require dynamic linking (linking at run time) unless the -static option was given to ld(1) during compilation.
+
+ldconfig:
+* ldconfig依据/etc/ld.so.conf搜索动态库，结果保存在/etc/ld.so.cache。优先级在LD_LIBRARY_PATH之后。
+* 主要是管理动态库配置的缓存。如果新安装了动态库，需要手动运行ldconfig，否则可能找不到新安装的库。
+* ld.so.conf通常只有一行include，conf.d目录下有多个配置文件。
+* https://man.linuxde.net/ldconfig
+
+rpath:
+* 在elf文件或动态库中的header区域，记录的动态库路径，优先于LD_LIBRARY_PATH
+* `gcc -Wl,-rpath=xxx`可以在链接时指定rpath，但一般不这么做。
+* https://en.wikipedia.org/wiki/Rpath
 
 ## ld链接
 
@@ -108,6 +153,8 @@ http://tldp.org/HOWTO/Program-Library-HOWTO/static-libraries.html
 `man 8 ld.so`
 http://xahlee.info/UnixResource_dir/_/ldpath.html
 http://osr507doc.sco.com/en/tools/ccs_linkedit_dynamic_dirsearch.html
+
+从`man 8 ld.so`看，LD_LIBRARY_PATH也用于链接。目前没看到LD_RUN_PATH的权威资料。
 
 ### LD_RUN_PATH
 

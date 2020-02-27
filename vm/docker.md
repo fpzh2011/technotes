@@ -31,11 +31,15 @@ https://hujb2000.gitbooks.io/docker-flow-evolution/content/cn/index.html
 https://stackoverflow.com/questions/41768157/how-to-link-container-in-docker
 https://stackoverflow.com/questions/32744509/docker-network-link-to-2-or-multiple-containers
 
+## dockerfile
 
+### From
 
-start可以启动一个容器，但是退出后，容器也退出了。能否以dameon方式start一个已经创建的容器？如果attach一个dameon容器，退出后，容器会退出吗？
-
-
+一个dockerfile可以有多个From指令
+https://docs.docker.com/engine/reference/builder/#from
+Use multi-stage builds
+https://docs.docker.com/develop/develop-images/multistage-build/
+https://blog.alexellis.io/mutli-stage-docker-builds/
 
 ## 安装
 

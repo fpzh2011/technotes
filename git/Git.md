@@ -98,7 +98,7 @@ commit将暂存区的内容移动到版本库（Repository）的当前分支。�
 `detached HEAD`指向的commit是dangling的，垃圾收集过程会清除这些commit。
 interactive rebase是通过`detached HEAD`完成的。
 
-上一个版本是HEAD^，上上一个版本是HEAD^^，依次类推。往上100个版本，可以写为HEAD~100。
+上一个版本是`HEAD^`，上上一个版本是`HEAD^^`，依次类推。往上100个版本，可以写为`HEAD~100`。
 HEAD不一定是整个仓库的最新版本，可能比其它分支的版本旧。
 
 
@@ -188,7 +188,7 @@ gitpro P86
 
 `git clone http://zhengjh@git.sinosure.com.cn/scm/~zhengjh/zhengjh.git`
 
-git支持多种协议，ssh、http、https等。默认的 git@git.sinosure.com.cn:scm/~zhengjh/zhengjh.git 使用ssh协议。
+git支持多种协议，ssh、http、https等。默认的 `git@git.sinosure.com.cn:scm/~zhengjh/zhengjh.git` 使用ssh协议。
 
 如果通过git、ssh协议传输，服务器端会在传输前把需要传输的各种对象先打好包再进行传输；而http（s）协议则会反复请求要传输的不同对象。现在Git对http（s）协议传输Git仓库做了一定的优化，http（s）传输现在也能达到ssh协议的效率。但是https需要输入口令。
 
@@ -281,6 +281,19 @@ Git Pro 中文版，P30-32
 ### checkout
 
 当检出一个分支时，它会修改HEAD指向新的分支引用，将索引（暂存区）填充为该次提交的快照，然后将索引的内容复制到工作目录中。（Pro Git，P237）
+
+## submodule
+
+```shell
+git clone https://github.com/fpzh2011/c.git
+cd c
+git submodule add https://github.com/fpzh2011/p
+```
+git submodule add创建`.gitmodules`、module目录、并下载module内容。
+git clone如果不带recursive参数，只会创建module目录，但是module目录是空的，不会下载module。但是会下载`.gitmodules`，因为这个文件是repo的一部分。
+`git submodule update --init`会下载新clone repo的submodule内容。
+如果对p做修改并push到remote，`git submodule update --init`和clone recursive都不会得到最新修改，仍是之前的p的内容。
+只有`git submodule update --init --remote`并push到remote c之后，`git pull --ff-only`可以得到p的最新修改，但是内容并没有改变。`git submodule update --init`才会看到最新修改的p的内容。如果没有pull直接submoduleupdate，p的内容也不会改变。
 
 
 ## 参考资料

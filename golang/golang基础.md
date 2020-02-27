@@ -1,5 +1,7 @@
 # Go语言基础
 
+Go 语言实践：编写可维护的程序的建议 https://juejin.im/post/5e0ab70ef265da5d0f098988
+
 Go是一门编译型语言，而且是静态编译（[3]，CH1.1）。
 
 Go语言的代码通过包（package）组织，包类似于其它语言里的库（libraries）或者模块（modules）。一个包由位于单个目录下的一个或多个.go源代码文件组成, 目录定义包的作用。每个源文件都以一条package声明语句开始（[3]，CH1.1）。
@@ -516,8 +518,14 @@ http://tmrts.com/go-patterns
 
 ## sleep tick
 
+个人感觉，如果不是对定时要求特别精确，用time.Sleep比较简单；如果需要灵活模式控制，tick更适合。
+
+详细讲解：
 https://blog.csdn.net/Star_CSU/article/details/86650684
 https://stackoverflow.com/questions/32147421/behavior-of-sleep-and-select-in-go
+https://www.qingtingip.com/h_235506.html
+https://xargin.com/go-timer/  这里有代码详细讲解
+https://github.com/cch123/golang-notes
 
 ## go并发控制
 
@@ -695,6 +703,8 @@ https://www.gitdig.com/go-operators/
 ## 反射reflect
 
 https://draveness.me/golang/basic/golang-reflect.html
+Go反射的三个原则
+https://sevenyu.top/2019/12/21/laws-of-reflection.html
 
 ## go test
 
@@ -711,6 +721,9 @@ Go编译时会忽略testdata目录。
 go test会运行package的init函数。
 
 ## 最佳实践
+
+High Performance Go Workshop
+https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html
 
 https://talks.golang.org/2013/bestpractices.slide
 https://golang.org/doc/effective_go.html
@@ -793,6 +806,8 @@ https://segmentfault.com/a/1190000020255157
 
 https://www.ardanlabs.com/blog/2019/05/garbage-collection-in-go-part2-gctraces.html?from=singlemessage
 https://mp.weixin.qq.com/s/eDd212DhjIRGpytBkgfzAg
+
+Go GC 20问 https://mp.weixin.qq.com/s/o2oMMh0PF5ZSoYD0XOBY2Q
 
 ### GOMAXPROCS
 

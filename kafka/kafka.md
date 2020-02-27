@@ -20,6 +20,32 @@ kafka使用zookeeper维护集群成员的关系([1] P73)
 
 key并不是表明消息唯一性的id。key的作用只是用于确定分区。相同的key在同一个分区内。([1]P4,45,85)
 
+## swarm
+
+https://raw.githubusercontent.com/wurstmeister/kafka-docker/master/docker-compose.yml
+```shell
+sudo docker ps
+
+docker exec -it xxx bash
+
+cd /opt/kafka_2.12-2.4.0/
+
+# list topic
+bin/kafka-topics.sh  --list --zookeeper zookeeper:2181
+
+# create topic
+bin/kafka-topics.sh --zookeeper zookeeper:2181 --create --topic test --partitions 10  --replication-factor 1
+
+# console consumer
+bin/kafka-console-consumer.sh  --bootstrap-server localhost:9092  --topic test --from-beginning
+
+# console producer
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+
+# get current offset. output: model_test:0:2, <topic>:<partition>:<offset>
+./bin/kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list localhost:9092 --topic topic-name
+```
+
 ## 参考资料
 
 [1] Kafka权威指南

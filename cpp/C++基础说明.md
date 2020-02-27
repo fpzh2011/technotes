@@ -78,6 +78,42 @@ gcc可以用 `int x = 0b101; ` ，符合C++2014标准，但目前并不是所有
 
 http://stackoverflow.com/questions/2611764/can-i-use-a-binary-literal-in-c-or-c
 
+## lambda表达式与函数对象
+
+https://www.jianshu.com/p/d686ad9de817
+
+如果捕获变量在lambda外部是引用类型，但是捕获列表中没有指定引用捕获形式，就按value捕获：
+```cpp
+// c++ -std=c++17
+#include <iostream>
+
+int main() {
+	int i = 0;
+	auto &ref = i;
+	ref = 1;
+	std::cout << ref << std::endl;
+
+	// copy
+	auto copy = [ref] () mutable {ref = 2;};
+	copy();
+	std::cout << ref << std::endl;
+
+	// ref
+	auto modify = [&ref] () mutable {ref = 3;};
+	modify();
+	std::cout << ref << std::endl;
+}
+```
+
+## traits
+
+https://blog.csdn.net/lihao21/article/details/55043881
+https://www.jianshu.com/p/6f18d17bc161
+https://harttle.land/2015/09/15/effective-cpp-47.html
+https://www.dongming.io/post/type_traits/
+https://zh.wikipedia.org/wiki/Traits_(计算机科学)
+https://zhuanlan.zhihu.com/p/85809752
+
 ## 浮点数
 
 `nan, inf`这些值都是[IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point)定义的，和1、2、3一样都是可存储为double的值。
@@ -106,6 +142,15 @@ int main() {
 	return 0;
 }
 ```
+
+## 静态/全局变量初始化顺序 static/global
+
+不同编译单元内，静态/全局变量初始化顺序是未定义的。
+函数+static可以保证初始化顺序。
+静态初始化可以保持线程安全(从[文档](https://en.cppreference.com/w/cpp/language/initialization)看是这样的)
+https://stackoverflow.com/questions/3746238/c-global-initialization-order-ignores-dependencies/3746249#3746249
+https://isocpp.org/wiki/faq/ctors#static-init-order
+https://en.cppreference.com/w/cpp/language/initialization
 
 ## 线程
 
@@ -136,6 +181,42 @@ int main() {
 	return 0;
 }
 ```
+
+## future
+
+https://www.cnblogs.com/haippy/p/3239248.html
+https://www.cnblogs.com/haippy/p/3279565.html
+https://www.cnblogs.com/haippy/p/3280643.html
+
+folly
+https://www.cnblogs.com/chenyangyao/p/folly-future.html
+https://my.oschina.net/fileoptions/blog/881798
+https://yq.aliyun.com/articles/115416
+https://zh.wikipedia.org/wiki/Future与promise
+
+## 内存模型
+
+我们必须对编译器和 CPU 作出一定的约束才能合理正确地优化你的程序，那么这个约束是什么呢？答曰：内存模型。
+内存模型是程序员、编译器，CPU 之间的契约，遵守契约后大家就各自做优化，从而尽可能提高程序的性能。
+https://www.cnblogs.com/haippy/p/3412858.html
+
+https://zh.cppreference.com/w/cpp/atomic/memory_order
+https://www.zhihu.com/question/24301047
+https://zhuanlan.zhihu.com/p/24983412
+https://github.com/forhappy/Cplusplus-Concurrency-In-Practice
+
+### atomic
+
+shared_ptr (C++17, gcc7.4.0):
+* 原子操作的一种实现: atomic_store_explicit(memory_order_release) / atomic_load_explicit(memory_order_acquire)
+* 实际是根据shared_ptr对象地址hash后、从gcc内置的若干个mutex中获取一个
+* [shared_ptr的control block是线程安全的](https://zh.cppreference.com/w/cpp/memory/shared_ptr/atomic)
+* C++20会实现`atomic<shared_ptr>`
+/App/gcc/include/c++/7.4.0/bits/shared_ptr_atomic.h
+https://github.com/gcc-mirror/gcc/blob/master/libstdc++-v3/src/c++11/shared_ptr.cc
+
+还有一种方式，是使用`atomic<size_t>`作index，结合vector。
+问题是：用mutex设置size_t后，vector被更新的元素，能否同步给其它线程？
 
 ## 类的几种常用函数
 

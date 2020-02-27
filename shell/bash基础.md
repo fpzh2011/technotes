@@ -313,6 +313,19 @@ flock -n 0 || {
 https://unix.stackexchange.com/questions/390329/statement-blocks-mechanism-in-shell-scripting
 https://stackoverflow.com/questions/21246552/bash-command-groups-why-do-curly-braces-require-a-semicolon
 
+## cron
+
+ubuntu
+https://github.com/Ekito/docker-cron/blob/master/Dockerfile
+index.cron末尾必须有换行符
+```shell
+cp index.cron /etc/cron.d/index.cron
+chmod 0644 /etc/cron.d/index.cron
+crontab /etc/cron.d/index.cron
+service cron restart
+```
+如果上一个cron任务还没有执行完，下一个调度周期的任务仍可以继续正常调度执行。
+
 ## flock
 
 flock的command必须是PATH中的文件，不能是shell内置命令或者脚本内的函数。
@@ -488,6 +501,24 @@ https://unix.stackexchange.com/questions/86270/how-do-you-use-the-command-coproc
 
 tmux new zjh-server  # new session
 tmux a -t zjh-server
+
+## jq
+
+```json
+{
+    "code": 0,
+    "data": {
+        "q": ["a", 1, {"a": "test"}],
+        "country": "中国",
+    }
+}
+```
+
+```shell
+cat test.json | jq '.'
+cat test.json | jq '.data.country'
+cat test.json | jq '.data.q[2].a'
+```
 
 ## 杂项
 
