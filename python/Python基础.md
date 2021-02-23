@@ -103,6 +103,7 @@ print j.keys()
 ### 从文件解析
 with open('data.json') as data_file:
     data = json.load(data_file)
+    json.dumps(data, indent=2, sort_keys=True)
 ```
 
 https://docs.python.org/2/library/json.html
@@ -1135,6 +1136,13 @@ pyreverse -A -k -S -o svg strategies
 https://docs.python.org/2/reference/expressions.html#boolean-operations
 https://blog.csdn.net/niuniuyuh/article/details/71213887
 http://www.diveintopython.net/power_of_introspection/and_or.html
+
+## http server
+
+```shell
+python -m SimpleHTTPServer 8080
+python3 -m http.server 8080
+```
 
 ## 问题
 

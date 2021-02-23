@@ -11,7 +11,7 @@
  http://blog.csdn.net/bonchoix/article/details/8044560
 
 ### STL
- 
+
 熟悉STL。让STL成为自己思维方式的一部分。
 
 ### 经典书籍
@@ -27,6 +27,13 @@ Effective STL
 也可以用gcc，gcc再调用g++。如 `gcc -c test.cpp; gcc -lstdc++ test.o`，或 `gcc -lstdc++ test.cpp`。但一般很少这样用。
 
 gcc根据文件名后缀决定采用哪种编译、链接动作（man gcc）。
+
+### 编译报警
+
+-Wreturn-type -Werror
+
+gcc -Wall -Wextra -Werror -x c -
+https://stackoverflow.com/questions/1610030/why-does-flowing-off-the-end-of-a-non-void-function-without-returning-a-value-no
 
 ### 支持标准
 
@@ -57,9 +64,16 @@ http://en.cppreference.com/w/cpp/language/user_literal
 https://akrzemi1.wordpress.com/2012/08/12/user-defined-literals-part-i/
 https://msdn.microsoft.com/zh-cn/library/dn919277.aspx
 
+## attribute
+
+https://zhuanlan.zhihu.com/p/64493524
+
+https://www.tutorialspoint.com/attributes-in-cplusplus
+Attributes are modern ways in C++ to standardize things if their code runs on different compilers. Attributes are used to provide some extra information that is used to enforce conditions (constraints), optimization and do specific code generation if required.
+
 ## raw string literal 
 
-如 `auto s = "(test)";`
+如 `auto s = R"(test)";`
 
 参考资料：
 http://blog.csdn.net/ubiter/article/details/35277247
@@ -77,6 +91,22 @@ https://www.zhihu.com/question/32173783
 gcc可以用 `int x = 0b101; ` ，符合C++2014标准，但目前并不是所有编译器都支持。
 
 http://stackoverflow.com/questions/2611764/can-i-use-a-binary-literal-in-c-or-c
+
+## map
+
+map loop erase
+https://stackoverflow.com/questions/8234779/how-to-remove-from-a-map-while-iterating-it
+
+http://www.cppblog.com/Solstice/archive/2013/01/20/197422.html
+
+## 除0
+
+C++标准规定，整数或浮点数除以0，结果是未定义的。
+
+整数除以0会core dump。
+
+在当前流行的gcc/amd64下，float/double除以0，会正常返回结果，结果是inf。（遵循IEC 60559 (formerly IEEE-754)标准）
+如果要严格遵循标准，一般还要考虑分母是极小值的情况。这个只能根据应用情况个别处理。
 
 ## lambda表达式与函数对象
 
@@ -152,6 +182,44 @@ https://stackoverflow.com/questions/3746238/c-global-initialization-order-ignore
 https://isocpp.org/wiki/faq/ctors#static-init-order
 https://en.cppreference.com/w/cpp/language/initialization
 
+
+## virtual destructor 虚拟析构函数
+
+* Base声明virtual destructor
+* Derived不需要再声明virtual destructor
+* Derived可以不实现析构函数
+```c++
+#include <iostream>
+#include <memory>
+
+class E {
+public:
+    ~E() {
+        std::cout << "E destruct" << std::endl;
+    }
+};
+
+class Base {
+public:
+    virtual ~Base() {
+        std::cout << "Base destruct" << std::endl;
+    }
+};
+
+class Derived : public Base {
+public:
+    ~Derived() {
+        std::cout << "Derived destruct" << std::endl;
+    }
+    E e;
+};
+
+int main() {
+    std::unique_ptr<Base> d = std::make_unique<Derived>();
+    return 0;
+}
+```
+
 ## 线程
 
 主线程退出后，`detach`的线程也会被终止、不会抛异常。
@@ -182,6 +250,10 @@ int main() {
 }
 ```
 
+### 线程池
+
+folly.md
+
 ## future
 
 https://www.cnblogs.com/haippy/p/3239248.html
@@ -194,7 +266,62 @@ https://my.oschina.net/fileoptions/blog/881798
 https://yq.aliyun.com/articles/115416
 https://zh.wikipedia.org/wiki/Future与promise
 
+## tcmalloc
+
+https://github.com/gperftools/gperftools/blob/master/INSTALL
+
+unwind
+http://download.savannah.gnu.org/releases/libunwind/libunwind-0.99-beta.tar.gz
+
+CXXFLAGS
+`-fno-omit-frame-pointer`
+http://codemacro.com/2015/04/06/tcmalloc-getstacktrace/
+
+## 内存检测
+
+### valgrind
+
+```shell
+  valgrind \
+  --error-markers=--------, \
+  -v --gen-suppressions=all --suppressions=/data/logs/my.supp \
+  --leak-check=yes \
+  --log-file=/data/logs/valgrind.log \
+  --num-callers=100 \
+  --track-origins=yes \
+  ./model_server  ../config/model_server.conf
+```
+
+筛选suppression规则
+```python
+supp = False
+with open('valgrind.log') as f:
+    for line in f:
+        line = line.strip()
+        if line == '{':
+            print(line)
+            supp = True
+        elif line == '}':
+            print(line)
+            supp = False
+        elif supp:
+            print(line)
+```
+
+### Address Sanitizer (ASan)
+
+https://www.jianshu.com/p/3a2df9b7c353
+
+## mutex
+
+shared_mutex
+http://dengzuoheng.github.io/cpp-concurency-pattern-7-rwlock
+
 ## 内存模型
+
+6种Memory Order的通俗解释
+http://senlinzhan.github.io/2017/12/04/cpp-memory-order/
+https://www.zhihu.com/question/24301047
 
 我们必须对编译器和 CPU 作出一定的约束才能合理正确地优化你的程序，那么这个约束是什么呢？答曰：内存模型。
 内存模型是程序员、编译器，CPU 之间的契约，遵守契约后大家就各自做优化，从而尽可能提高程序的性能。
@@ -345,6 +472,11 @@ int main() {
 ```
 有没有更可靠的方法防止除法出现inf？
 
+## lint
+
+https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py
+另外需要增加 .arclint 文件
+
 ## 开源项目
 
 leveldb https://github.com/google/leveldb
@@ -354,6 +486,45 @@ http://en.cppreference.com/w/cpp/links/libs
 ## 其它
 
 `std::this_thread::sleep_for(std::chrono::seconds(1));`
+
+## logging
+
+### log4cplus
+
+https://blog.csdn.net/notation/article/details/8519707
+https://www.cnblogs.com/woshizhizhong-tech/p/8449402.html
+http://www.jeepxie.net/article/540381.html
+
+## 内存分析
+
+内存分析
+* c++ mem analysis
+* https://www.reddit.com/r/cpp/comments/9ojiyj/memory_analyzer_for_cc/
+* Google-perftools includes performance and memory tools.
+* Valgrind
+  * massif tool from Valgrind: http://valgrind.org/docs/manual/ms-manual.html and use Massif Visualizer https://www.linux-apps.com/content/show.php?content=122409 to visualize the output
+* heaptrack https://github.com/KDE/heaptrack ( similar to Massif Visualizer, but doens't use Valgrind for tracking)
+
+## 获取进程信息
+
+如占用内存rss
+https://www.tutorialspoint.com/how-to-get-memory-usage-at-runtime-using-cplusplus
+
+## python binding
+
+pybind11
+https://zhuanlan.zhihu.com/p/192974017
+https://zhuanlan.zhihu.com/p/52619334
+https://segmentfault.com/a/1190000023886545
+https://github.com/liff-engineer/pybind11-examples 打包为whl格式
+
+swig
+https://segmentfault.com/a/1190000013219667
+
+## vscode remote containers
+
+https://code.visualstudio.com/docs/remote/containers
+https://code.visualstudio.com/docs/remote/containers-advanced#_improving-container-disk-performance
 
 ## 参考资料与在线资源
 

@@ -188,6 +188,17 @@ https://my.oschina.net/zjzhai/blog/225112
 
 https://docs.docker.com/compose/extends/
 
+## shutdown
+
+stop/restart命令，容器内进程收到的信号是SIGTERM(15)
+```shell
+docker container stop
+docker container restart 
+```
+docker kill收到的信号应该是SIGKILL(9)
+
+docker container pause会让容器内进程停止，unpause会让进程继续执行。
+
 ## 网络
 
 swarm的compose文件中：

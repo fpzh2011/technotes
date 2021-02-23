@@ -18,7 +18,6 @@ Go语言不允许使用无用的局部变量（local variables），因为这会
 go doc text/template
 ```
 
-
 ## 变量
 
 ### 命名
@@ -181,6 +180,10 @@ func Signum(x int) int {
 ```
 switch也可以紧跟一个简短的变量声明，一个自增表达式、赋值语句，或者一个函数调用。
 
+## FileWatcher
+
+https://github.com/fsnotify/fsnotify
+
 ## 堆栈分析stack
 
 https://mp.weixin.qq.com/s/SGbiWLW6pLfd32TKIil10A
@@ -220,6 +223,8 @@ https://studygolang.com/articles/14058
 ### time
 
 https://studygolang.com/topics/2192
+时间包
+https://github.com/jinzhu/now
 
 ## 代码格式
 
@@ -468,6 +473,9 @@ https://studygolang.com/articles/4356
 
 ### go mod
 
+Go Modules 终极入门
+https://mp.weixin.qq.com/s/zo7zmEVXvxgr80n6H_49Mg
+
 一个module是相关Go package的一个集合。modules是源码交互和版本控制的单元。
 http://www.huamo.online/2019/07/08/Golang-Modules学习/
 
@@ -488,7 +496,7 @@ https://mp.weixin.qq.com/s/SGGV3tWEg5AAJ7I_FcK0cg
 
 ```
 # go >=1.13 需要配置
-GOPRIVATE="code.rightpaddle.cn"
+GOPRIVATE="code.xxx.cn"
 ```
 
 ## interface 接口
@@ -537,6 +545,9 @@ https://zhuanlan.zhihu.com/p/59295820
 
 map不是协程安全的
 https://www.jianshu.com/p/f2e7650da938
+
+在 Go 語言內管理 Concurrency 的三種方式
+https://blog.wu-boy.com/2020/08/three-ways-to-manage-concurrency-in-go/
 
 ### context
 
@@ -618,6 +629,10 @@ go是一个强类型语言，所以不能像Python那样把string直接解析为
 
 Unmarshal可以自动把首字母转为大写(仅限于首字母)，但Marshal不会对字段名做这种转换。两个方法都**不会**把下划线分隔的名字转为驼峰风格、并转换每部分的首字母为大写。
 
+### 动态json库 dynamic json
+
+https://github.com/Jeffail/gabs
+
 ## yaml
 
 https://github.com/go-yaml/yaml
@@ -696,6 +711,11 @@ IntelliJ IDEA
 Sublime Text + Go Sublime
 Vim with vim-go plugin
 
+### VS Code/VsCode
+
+VS Code 快速查看 Golang 接口
+https://mp.weixin.qq.com/s/3wlwuA2sAm-sWSilBJptiA
+
 ## 隐晦操作符
 
 https://www.gitdig.com/go-operators/
@@ -738,6 +758,12 @@ https://chai2010.cn/advanced-go-programming-book/appendix/appendix-a-trap.html
 
 https://github.com/hoanhan101/ultimate-go
 
+## Graceful Restart in Golang
+
+https://grisha.org/blog/2014/06/03/graceful-restart-in-golang/
+https://github.com/fvbock/endless
+https://colobu.com/2015/10/09/Linux-Signals/
+
 ## 开源项目 open source
 
 https://github.com/hashicorp/consul
@@ -772,6 +798,10 @@ https://chai2010.cn/advanced-go-programming-book/ch2-cgo/ch2-02-basic.html
 
 https://github.com/Alikhll/golang-developer-roadmap/blob/master/i18n/ReadMe-zh-CN.md
 
+## 内存管理
+
+https://tonybai.com/2020/03/10/visualizing-memory-management-in-golang/
+
 ## 问题
 
 struct与class的区别是什么？有class关键字吗？
@@ -803,6 +833,9 @@ https://mp.weixin.qq.com/s/3gGbJaeuvx4klqcv34hmmw
 
 gc日志格式
 https://segmentfault.com/a/1190000020255157
+
+方圆
+https://zhuanlan.zhihu.com/p/77943973
 
 https://www.ardanlabs.com/blog/2019/05/garbage-collection-in-go-part2-gctraces.html?from=singlemessage
 https://mp.weixin.qq.com/s/eDd212DhjIRGpytBkgfzAg
@@ -863,6 +896,11 @@ https://www.cyhone.com/articles/analysis-of-uber-go-ratelimit/
 ### immutability
 
 slice, map可否声明为不可变的？
+
+## docker
+
+最精简的docker镜像
+https://mp.weixin.qq.com/s/TKt4AViDeP7cWjGym5oKyg
 
 ## 参考资料
 

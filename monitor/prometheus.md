@@ -27,14 +27,32 @@ Gauge可用于表示任意升降的值，比如温度。
 The essential difference between summaries and histograms is that summaries calculate streaming φ-quantiles on the client side and expose them directly, while histograms expose bucketed observation counts and the calculation of quantiles from the buckets of a histogram happens on the server side using the histogram_quantile() function.
 https://prometheus.io/docs/practices/histograms/
 
+## label
+
+https://prometheus.io/docs/concepts/data_model/
+同一个metric的label个数可以是变化的。
+如果label value是空字符串，表明没有这个label。
+
+## prometheus-cpp
+
+* family是指counter/histogram等prometheus类型
+* 一个family对应一个metric name
+* 一个counter/histogarm对应一个<name, labels>的组合
+* 一个family可以有不同个数的label组合
+* 同一个metric name，metric必须唯一，否则register时会抛出异常（默认情况）
+* registry中的vector<unique_ptr<Family<Counter>>>存储所有counter metrics（不同的name）
+
 ## query
 
 https://prometheus.io/docs/prometheus/latest/querying/basics/
 
 ```
 # 耗时-正则表达式
+histogram_quantile(0.99, sum(rate(latency_ms_bucket{job="kubernetes-pods",kubernetes_namespace="sprs",app="model-server",cluster="shareit-cce-pre"}[1m])) by(le, request_app))
 histogram_quantile(0.99, sum(rate(module_request_duration_seconds_bucket{module=~"ssdfsf|asfsdf.*"}[1m])) by(le, module, component, method))
 histogram_quantile(0.99, sum(rate(module_request_duration_seconds_bucket{module!~"ssdfsf|asfsdf.*"}[1m])) by(le, module, component, method))
+# QPS (counter metric)
+sum(irate(counter{job="kubernetes-pods",kubernetes_namespace="sprs",app="model-server",cluster="shareit-cce-pre", step="feed_total"}[1m])) by(request_app)
 # 基于histogram计算qps
 sum(irate(phoenix_count{method_name="PD.phoenix.get_feed"}[1m]))
 # 求avg

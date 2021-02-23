@@ -170,6 +170,14 @@ https://stackoverflow.com/questions/22053757/checkout-another-branch-when-there-
 如果提交错误文件到本地仓库，可以通过上述`git reset`命令切换到合适的版本。
 但如果将本地仓库的内容提交到了远程仓库，就无法撤回修改了。
 
+## tag
+
+```shell
+git tag -m 'export init env' 1.0.1
+git tag --delete 1.0.1
+git push --delete origin 1.0.1
+```
+
 ## rebase
 
 gitpro P86

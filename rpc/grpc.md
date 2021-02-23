@@ -1,5 +1,8 @@
 # grpc笔记
 
+问题：
+* 为什么实际deadline会远高于设置的值？偶发的。
+
 概述
 https://grpc.io/
 
@@ -20,12 +23,27 @@ https://doc.oschina.net/grpc?t=56831
 
 ### Deadlines/Timeouts 单次调用超时
 
-timeout应该是通过HTTP2 headers实现的
+deadline应该是通过HTTP2 headers实现的
 https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
 
 Always set a deadline. 默认的timeout一般都很大。C++/Go/Java设置deadline的方法。
 https://grpc.io/blog/deadlines/
 https://www.grpc.io/docs/guides/concepts/#deadlines
+
+deadline是一个时间点，timeout是一段时间（比如3秒）
+https://github.com/grpc/grpc-java/issues/1495
+
+超时远高于deadline
+* network connectivity: iptables, elb restart
+* the size of the message we were trying to send was relevant
+* the trigger for the blocking was the TCP send buffer filling up
+* It will stay that way until either connectivity is restored, or the kernel gives up on that particular connection, closing it.
+* 基本解决方案
+  * keepalive + TCP_USER_TIMEOUT 由原来的block 15-20分钟，降低到block 2分钟
+    * TCP_USER_TIMEOUT比超时时间略大一些
+  *  tcp_syn_retries
+https://www.hostedgraphite.com/blog/deadlines-lies-and-videotape-the-tale-of-a-grpc-bug
+https://news.ycombinator.com/item?id=18382149
 
 ### channel
 
@@ -230,6 +248,10 @@ https://stackoverflow.com/questions/51764721/grpc-cpp-async-server-vs-sync-serve
 线程图示
 https://www.jianshu.com/p/551e6578f5df
 
+## 健康检查 health check
+
+https://segmentfault.com/a/1190000018362469
+
 ## keepalive
 
 https://github.com/grpc/grpc/blob/master/doc/keepalive.md
@@ -255,7 +277,7 @@ ghz \
 	--proto protofile \
 	--call package.Service.Method \
 	--insecure \
-	-skipTLS \
+	--skipTLS \
 	-config configfile \
 	--concurrency 1 \
 	--qps 5 \
@@ -311,7 +333,41 @@ When a connection fails, the load balancer will begin to reconnect using the las
 https://grpc.io/blog/grpc_on_http2/
 如果没有conn fail，dns多久更新一次cache？
 
+### k8s环境下的负载均衡
+
+如果client与server是同一个集群：
+* server使用headless，一次返回所有pod ip
+* 配置coredns使得查询结果在30秒内失效
+* 需要配置resolve/dns的dot，优化外网域名解析
+
+如果client与server在不同集群：
+* 在server集群部署ingress网络，有多种负载均衡策略，可以在proxy层实现统计监控、重试、熔断等
+* 如果集群创建时合理设置cluster.local等dns配置，跨集群貌似也可以用类似headless方案
+* etcd：需要改server和client代码。server启动时注册etcd、退出时注销。client通过etcd获取服务地址。
+* sidecar/service mesh
+
+ingress + envoy跨集群:
+* client只有一个proxy的连接。
+* 如果有两个client，server有两个连接，应该是和client数量一致。
+* envoy跟每个client和server都有连接。连接数是`n*m`，相当于用空间换效率。
+* 如果在服务的envoy实例挂掉，会自动切到其它实例，有少量错误。估计envoy默认没有grpc那样的graceful exit机制。
+
+cps: 每秒新建连接速率
+rps: 每秒交易速率
+
+### etcd
+
+https://github.com/etcd-io/etcd/pull/9860
+https://github.com/DavadDi/grpclb
+https://github.com/liyue201/grpc-lb
+https://colobu.com/2017/03/25/grpc-naming-and-load-balance/
+
 ### grpc dns resolve
+
+C++
+* dnnrr: docker需要在一个集群内
+* server: max age
+* client: custom channel, round robin load balance
 
 https://gist.github.com/lyuxuan/515fa6da7e0924b030e29b8be56fd90a
 Dial接受一系列的DialOption。还可以设置默认的CallOption列表。
@@ -449,6 +505,8 @@ _Rendezvous: <_Rendezvous of RPC that terminated with:
 如果很大的流量，只用一条grpc连接，是否合适？
 channel和conn的关系是什么？为什么再封装一层channel？
 
+需要通过channel->GetState(true)主动检查状态吗？如果物理连接断开，是否会自动重试连接？
+
 运维触发的网络闪断，比如LB切换，有没有什么好的解决办法，减轻grpc长连接的影响。整个系统很多服务都会有影响，可能会有链式反应。
 重试一次是否可以解决问题？结合grpc的LB策略。如果SLB切换，多长时间能获取下一个有效地址？
 
@@ -457,10 +515,32 @@ c++ server中，每个请求一个thread？可以测试一下，每个请求都s
 如果用了folly，是否也每个请求一个线程？
 
 C++线程:
+* 如果不指定folly executor，那么是使用grpc的线程池？这有什么影响？即使用folly的executor，最后fut.get时仍会阻塞？其它请求仍无法处理？
 * 如果用同步client，每个请求阻塞1小时，验证是否每个请求占用一个线程
 * 如果用异步客户端，每个请求阻塞1小时，是否每个请求占用一个线程？
 * server也可以进行同样的测试。
+* server shutdown后5秒，client继续请求，得到的是什么状态、信息？
+* grpc server收到一个请求q1后，应该会占用一个线程t1；在这请求q1处理完之前，线程t1还能继续处理其它请求吗？如果不能，vertx的意义何在？如果可以，如何验证？
+  * 如果只是测folly线程，可以这样：从stdin读取一行，然后创建一个future，看是否在另一个线程、或者看在返回前能否接受第二个行输入。
+  * !!!!!!!1 打印main线程id，executor线程id，看是否一致。wangle可以查看队列长度。
+  * 一种测试手段：打印grpc server线程id，同时打印folly future线程id、wangle线程id。vertx也可以用这种方法测试。
+  * C++中能否得到线程编号，grpc server线程中打印这个线程编号，sleep一段时间
+  * 限制docker的内存，多少个请求可以把服务打爆？线程一只sleep，线程太多导致内存满
+  * C++ server的worker线程个数是不是有限的？如果是，那么后续的client请求会超时。
+  * 能否限制worker线程个数。比如限制到1个，就可以验证异步任务下，t1线程是否会继续处理其它线程。如果是grpc server c++同步方式，估计不会。
+  * 如果是同步c++ server，在server内使用异步操作，是否还有意义？作用何在？如果需要处理多个子任务，用folly future是有意义的。否则每个子任务需要单独的线程。
+  * 如果server在q1结束前就处理其它请求了，那么q1的栈及其对象还存在吗，这是如何处理的？这个应该是completion queue实现的吧？java是如何处理的？
+  * 以上也要看异步completion queue是如何处理请求的。
+  * 如果folly的Future一开始就via了一个线程池，是否会出让grpc server线程？如何出让？如果future阻塞，新请求会因为线程被占用而阻塞吗，可以在service里面收到请求时检查。
+  * 本方法的一个常见的用例是将 CPU 从 I/O 线程中解放出来，以避免队列中其他请求的排队时间。   代码哪里能看到队列呢？ https://yq.aliyun.com/articles/115416
+  * 当前版本的folly future，如何捕获中间某个io操作的异常并进行统计？
+  * itoi/utoi是否用了异步server？
+  * 以上思路，也可以用go或者vertx试验。
 https://stackoverflow.com/questions/52298811/c-grpc-thread-number-configuration
+  auto stats = common::getGlobalCPUExecutor()->getPoolStats();
+  common::Stats::get()->AddMetric(
+    "api_executor_pool_length", stats.pendingTaskCount)
+
 
 graceful shutdown (c++/go/python/java)
 最简单的方式：可以结合k8s preStop ，在stop命令中sleep一段时间以便处理完现有请求。这段时间因为pod处于Terminating不会接受新请求。

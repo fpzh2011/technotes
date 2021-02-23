@@ -26,6 +26,14 @@ https://www.cnblogs.com/yhzhou/p/10568728.html
 训练/构建索引过程
 https://blog.razrlele.com/p/2594
 
+### 高维空间最近邻逼近搜索算法评测
+
+https://zhuanlan.zhihu.com/p/37381294
+https://github.com/erikbern/ann-benchmarks
+
+另一种方法是局部敏感哈希，faiss貌似也有简单实现。
+https://github.com/facebookresearch/faiss/wiki/Comparison-with-LSH
+
 ## Product Quantization
 
 把原来的向量空间分解为若干个低维向量空间的笛卡尔积，并对分解得到的低维向量空间分别做量化（quantization）。这样每个向量就能由多个低维空间的量化code组合表示。
@@ -41,6 +49,29 @@ https://zh.wikipedia.org/wiki/量化_(信号处理)
 https://baike.baidu.com/item/Quantization
 https://baike.baidu.com/item/矢量量化
 
+## cosine 相似度
+
+faiss search的cosine距离是降序输出，score大的排前面。
+L2距离是升序输出，score/distance小的排前面。
+https://github.com/facebookresearch/faiss/wiki/MetricType-and-distances
+
+## 索引类型
+
+索引选择
+https://waltyou.github.io/Faiss-Indexs/
+
+### 汉明距离
+
+https://zhuanlan.zhihu.com/p/105214010
+
+### IndexIVF
+
+IndexIVF类的索引，search返回数量如果不足，需要设置nprobe。
+ClusteringParameters存储聚类参数。
+https://zhuanlan.zhihu.com/p/34184844
+https://github.com/facebookresearch/faiss/wiki/Faiss-indexes#cell-probe-methods-indexivf-indexes
+https://github.com/facebookresearch/faiss/wiki/Faster-search
+
 ## 工程实践
 
 基于gRPC的Faiss server实践
@@ -48,6 +79,18 @@ https://juejin.im/post/5d5b8e7be51d4561f777e1b6
 
 Tips
 https://blog.razrlele.com/p/2594
+
+如果有多个query vector，必须排序后返回top k。因为只在单个query内有序。
+https://github.com/facebookresearch/faiss/wiki/Getting-started
+
+### 异常处理
+
+search如果传入一个空的向量，C++会Segmentation fault。但如果向量维度不对（或大或小或不对齐），不会抛出异常，可以正常返回数据，只是会影响准确度。
+如果查询向量只有一个0或者1，返回的id可能都是-1。
+nq表示search接口中的查询向量个数。如果查询向量size是1，nq是20，也不会报错。nq为0也不会抛出异常。
+
+python的search接口，如果查询向量维度与索引不一致，就会抛出异常。
+因为C++的查询向量是展平的一维数组，而python的查询向量是二维数组。
 
 ### docker
 
@@ -104,11 +147,4 @@ https://rawgit.com/facebookresearch/faiss/master/docs/html/annotated.html
 
 [index读写操作](https://github.com/facebookresearch/faiss/issues/417)：
 * write_index/read_index
-
-
-
-## 疑问
-
-faiss只支持整数id，但是我们的item id是string。
-
 

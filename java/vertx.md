@@ -6,6 +6,32 @@ http://www.sczyh30.com/posts/Asynchronous/vertx-blueprint-1-todo-backend-tutoria
 http://www.sczyh30.com/posts/Asynchronous/vertx-blueprint-2-vertx-kue-core-tutorial/
 https://vertxchina.github.io/vertx-translation-chinese/start/SimpleStart.html
 
+## 异步
+
+handle方法返回的时候，response可能并没有发送。vertx只是构建了一个future组成的pipeline，future之间有回调关系。handle返回后，继续处理其它请求。所以才要求不要有耗时操作（cpu/io）阻塞线程。如果有耗时操作，使用其它线程池。这样将任务交给其它线程、将event loop线程解放出来、继续处理其它请求。
+
+最后future.get()是在setHandler里面调用的，不会阻塞线程。只有event就绪后才会执行future.get()。
+
+这些future构成的task应该在一个或若干个queue里面。
+
+感觉是：一个vert.x的event loop线程个数是核数2倍，但是一个verticle实例只分配一个event loop线程。所以可以扩展verticle实例个数。
+```
+A Vert.x instance maintains N event loop threads (where N by default is core*2) by default.
+Standard verticles are assigned an event loop thread when they are created and the start method is called with that event loop.
+```
+https://vertx.io/docs/vertx-core/java/
+https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html#DEFAULT_EVENT_LOOP_POOL_SIZE
+
+部署多个verticle instance
+```java
+DeploymentOptions options = new DeploymentOptions().setInstances(16);
+vertx.deployVerticle("com.mycompany.MyOrderProcessorVerticle", options);
+```
+https://stackoverflow.com/questions/49775238/vertx-web-server-uses-only-one-event-loop-thread-while-16-are-available
+
+如果不使用worker verticle、也不创建自己的线程，所有任务都会在一个event loop线程上处理，context也是。
+you can write all the code in your application as single threaded and let Vert.x worry about the threading and scaling.
+
 ## 实现类
 
 ```

@@ -187,6 +187,13 @@ https://wiki.gentoo.org/wiki/GCC_optimization/en
 * `-j`: the number of recipes to execute at once。如果后面没有整数参数，则并发recipe的个数没有限制。
 * `-n`或`--just-print`只会打印recipe命令，不会执行。
 
+## 打印变量 print variable
+
+```makefile
+$(info    VAR is $(VAR))
+```
+https://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
+
 ## 疑问
 
 remake makefile

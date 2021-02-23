@@ -115,6 +115,12 @@ curl -XPOST "localhost:9200/ik/intern/_search?explain&pretty" -H "Content-Type: 
 }'
 ```
 
+### 查询操作符
+
+https://www.elastic.co/guide/cn/elasticsearch/guide/current/bool-query.html#_%E6%8E%A7%E5%88%B6%E7%B2%BE%E5%BA%A6
+* must: 所有条件必须满足
+* should: 如果有must，所有should都可以不满足（or）。如果没有must，只好一个should满足。更准确的说，是用过参数`minimum_should_match`控制。
+
 ## type
 
 type在ES6为deprecated， 将在ES7中删除。
@@ -128,7 +134,7 @@ you can implement your own custom `type` field which will work in a similar way 
 
 ## 分词
 
-查看文档的term vertors _termvectors
+查看文档的term vertors`_termvectors`
 https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docs-termvectors.html
 ```shell
 curl -X GET "localhost:9200/twitter/tweet/1/_termvectors"

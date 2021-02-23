@@ -6,6 +6,9 @@ https://www.gnu.org/software/bash/manual/html_node/index.html
 http://tiswww.case.edu/php/chet/bash/NEWS
 https://www.tldp.org/LDP/Bash-Beginners-Guide/html/
 
+Bash Shell 脚本的实践指南
+https://mp.weixin.qq.com/s/gDyB2mkPBE3BaJ6rDrAYqA
+
 ## 切换shell
 
 ```shell
@@ -165,6 +168,44 @@ https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#Bash-Built
 
 参考`man bash`的`source filename`一节。
 
+## string compare
+
+https://linuxize.com/post/how-to-compare-strings-in-bash/
+https://tldp.org/LDP/abs/html/comparison-ops.html
+macos的规则更宽松，与linux不完全兼容。
+```bash
+# []用单个等号
+VAR1="Linuxize"
+VAR2="Linuxize"
+if [ "$VAR1" = "$VAR2" ]; then
+  echo "Strings are equal."
+else
+  echo "Strings are not equal."
+fi
+
+# [[]]用两个等号，==, !=。也可以用&& ||
+if [[ "$VAR1" == "$VAR2" ]]; then
+  echo "Strings are equal."
+else
+  echo "Strings are not equal."
+fi
+# if [[ $varA == 1 && ($varB == "t1" || $varC == "t2") ]]; then
+# if [ "$varA" = 1 ] && { [ "$varB" = "t1" ] || [ "$varC" = "t2" ]; }; then
+
+# 空字符串
+VAR=''
+if [[ -z $VAR ]]; then
+  echo "String is empty."
+fi
+VAR='Linuxize'
+if [[ -n $VAR ]]; then
+  echo "String is not empty."
+fi
+```
+
+
+
+
 ## printf 优于 echo
 
 `printf "%s\n" "$a"`
@@ -277,6 +318,18 @@ comm
 
 `iconv -f GB18030 -t UTF-8 1.md > 2.md`
 
+## io
+
+```shell
+while [ 1 ]
+do
+    sudo iostat -d -m -p vdc
+    sleep 2
+done
+
+
+```
+
 ## awk
 
 `BEGIN { FS = "\x01" }`
@@ -315,6 +368,7 @@ https://stackoverflow.com/questions/21246552/bash-command-groups-why-do-curly-br
 
 ## cron
 
+如果上一个cron任务还没有执行完，下一个调度周期的任务仍可以继续正常调度执行。
 ubuntu
 https://github.com/Ekito/docker-cron/blob/master/Dockerfile
 index.cron末尾必须有换行符
@@ -324,7 +378,17 @@ chmod 0644 /etc/cron.d/index.cron
 crontab /etc/cron.d/index.cron
 service cron restart
 ```
-如果上一个cron任务还没有执行完，下一个调度周期的任务仍可以继续正常调度执行。
+
+centos7
+```shell
+
+crontab index.cron
+sudo crond
+```
+CentOS Linux release 7.6.1810 ，docker，如果两个任务的调度时间相同，会报如下错误。这时候在docker启动脚本如果调用crontab/crond，可能会导致docker退出。
+```
+crond: can't lock /var/run/crond.pid, otherpid may be 281: Resource temporarily unavailable
+```
 
 ## flock
 
@@ -385,6 +449,27 @@ echo 1234567890 | head -c 4
 nohup scp -C serving-sxs-app-01:/var/data/nginx/log/access.log.old /dev/stdout | bzip2 -ckz --quiet /dev/stdin > access1.bz2 &
 tar czf - /var/data/docker/volumes/syncdata_mysql_data | ssh devops@172.16.1.212 "cd /var/data && tar zxf -"
 tar -cz train/adapter/output/*/stat.csv | ssh server4 "cat >/home/ubuntu/log-stat-20190103/4.tar.gz"
+
+## trap 信号处理
+
+https://www.ibm.com/developerworks/cn/aix/library/au-usingtraps/index.html
+```shell
+function signal_handler {
+    echo signal_handler
+    # exit
+}
+
+function main {
+    trap 'signal_handler' SIGINT SIGTERM
+
+    while true; do
+        echo abc
+        sleep 1
+    done
+}
+
+main
+```
 
 ## 查看进程关系
 
@@ -518,7 +603,32 @@ tmux a -t zjh-server
 cat test.json | jq '.'
 cat test.json | jq '.data.country'
 cat test.json | jq '.data.q[2].a'
+# 输出数组中每个object的item_id字段
+cat ~/1.json  | jq -r '.response_' | jq -r '.reco_result' \
+  | jq -r ".[] | .item_id" \
+  | tr '\n' ':' | sed 's/:/","/g'
+# 获取object的所有key
+jq 'keys' file.json
+# 获取数组长度
+jq length /tmp/test.json
 ```
+
+[construct json string](https://stackoverflow.com/questions/48470049/build-a-json-string-with-bash-variables)
+```shell
+BUCKET_NAME=testbucket
+OBJECT_NAME=testworkflow-2.0.1.jar
+TARGET_LOCATION=/opt/test/testworkflow-2.0.1.jar
+
+JSON_STRING=$( jq -n \
+                  --arg bn "$BUCKET_NAME" \
+                  --arg on "$OBJECT_NAME" \
+                  --arg tl "$TARGET_LOCATION" \
+                  '{bucketname: $bn, objectname: $on, targetlocation: $tl}' )
+```
+
+## jo
+
+https://github.com/jpmens/jo/blob/master/jo.md
 
 ## 杂项
 

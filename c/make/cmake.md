@@ -21,6 +21,18 @@ make install
 ```
 https://cmake.org/install/
 
+## 动态库
+
+https://stackoverflow.com/questions/17511496/how-to-create-a-shared-library-with-cmake
+
+## 打印变量
+
+```
+message(STATUS "missing components: ${missingComponents}")
+```
+https://cmake.org/cmake/help/latest/command/message.html
+https://blog.csdn.net/Zhanganliu/article/details/99850603
+
 ## demo
 
 https://www.hahack.com/codes/cmake/
@@ -68,6 +80,10 @@ add_library (MathFunctions ${DIR_LIB_SRCS})
 ## 变量
 
 * CMAKE_INSTALL_PREFIX: 安装目录，一般默认是 /usr/local/bin
+
+## 设置选项option
+
+ cmake3 -DBUILD_TESTS=OFF ..
 
 ## 注意事项
 
